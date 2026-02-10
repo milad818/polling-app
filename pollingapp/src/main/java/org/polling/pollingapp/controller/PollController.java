@@ -2,6 +2,7 @@ package org.polling.pollingapp.controller;
 
 import org.polling.pollingapp.model.Poll;
 import org.polling.pollingapp.services.PollService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,5 +30,10 @@ public class PollController {
     @GetMapping("/all")
     public List<Poll> getPolls() {
         return pollService.getAllPolls();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Poll> getPollById(@PathVariable Long id) {
+        return pollService.getPollById(id);
     }
 }
