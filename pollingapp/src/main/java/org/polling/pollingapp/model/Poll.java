@@ -17,9 +17,7 @@ public class Poll {
     private String question;
 
     @ElementCollection  // A collection of non-entity values that belong entirely to this entity.
-    private List<String> options = new ArrayList<>();
+    private List<OptionVote> options = new ArrayList<>();
 
-    @ElementCollection
-    private List<Long> votes = new ArrayList<>();
 
 }
