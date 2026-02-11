@@ -1,6 +1,7 @@
 package org.polling.pollingapp.controller;
 
 import org.polling.pollingapp.model.Poll;
+import org.polling.pollingapp.request.Vote;
 import org.polling.pollingapp.services.PollService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,19 @@ public class PollController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Poll> getPollById(@PathVariable Long id) {
-        return pollService.getPollById(id);
+
+        return pollService.getPollById(id)
+                // Extracts the Poll from Optional<Poll> and wraps it in a ResponseEntity
+                .map(ResponseEntity::ok)
+                // Manual extraction (ugly)
+                //if (pollRepository.findById(id).isPresent()) {
+                //    return ResponseEntity.ok(pollRepository.findById(id).get());
+                //}
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/vote")
+    public void doVote (@RequestBody Vote vote) {
+        pollService.doVote(vote.getPollId(), vote.getOptionIndex());
     }
 }
