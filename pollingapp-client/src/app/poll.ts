@@ -14,7 +14,7 @@ export class PollService {
   constructor (private http: HttpClient) {}
 
   getPolls (): Observable<Poll[]> {
-    return this.http.get<Poll[]>(this.baseUrl)
+    return this.http.get<Poll[]>(`${this.baseUrl}/all`)
   }
 
   createPoll (poll: Poll): Observable<Poll> {

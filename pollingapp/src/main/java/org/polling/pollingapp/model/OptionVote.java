@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class OptionVote {
 
-    private String opt;
+    private String optText;
     private Long voteCount = 0L;
 
 }

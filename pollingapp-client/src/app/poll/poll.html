@@ -1,0 +1,23 @@
+<!-- <label> Question: </label>
+<input type="text" , placeholder="Type your question...">
+<button type="button" class="btn btn-primary">Create</button> -->
+
+
+<div class="container">
+  <h1 class="mt-4 text-center">Polling App</h1>
+  <h3>Below you can create and manage your own polls.</h3>
+  @for(poll of polls; track poll.id){
+  <div class="polls-container p-1">
+    <div class="border rounded p-3 mb">
+      <div> {{poll.question}} </div>
+      @for (option of poll.options; track $index) {
+      <div class="options-container p-1">
+        <button class="btn btn-outline-primary me-2 mt-2">
+          {{option.optText}} ({{option.voteCount}} votes)
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>

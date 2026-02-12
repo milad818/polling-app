@@ -13,6 +13,7 @@ import java.util.List;
 // It tells Spring to take the JSON or XML data from the body of an HTTP request and "deserialize" it into a Java object.
 @RestController
 @RequestMapping("/api/polls")
+@CrossOrigin(origins = "http://localhost:4200/")
 public class PollController {
     private final PollService pollService;
 
