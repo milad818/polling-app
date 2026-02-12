@@ -15,19 +15,21 @@ export class PollComponent implements OnInit {
 
   polls: Poll[] = [];
 
+  // Use constructor only for Dependency Injection
   constructor(private pollService: PollService) {
-
   }
 
+  // Use ngOnInit for initialization logic
   ngOnInit(): void {
     this.loadPolls();
   }
 
+  // Logic to call services or initialize state goes here
   loadPolls() {
     this.pollService.getPolls().subscribe({
       next: (data) => {
         this.polls = data;
-        // console.log(this.polls);
+        console.log(this.polls);
       },
       error: (error) => {
         console.error("Error fetching polls:", error)
