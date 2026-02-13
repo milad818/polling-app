@@ -14,6 +14,11 @@
           required
           minlength="5"
           #question="ngModel" />
+        <!--
+          Check if
+          Field has validation problems" (empty, too short, etc.)
+          User has clicked/tried this field
+        -->
         @if (question.invalid && question.touched) {
           <div class="error-message">
             @if (question.errors?.['required']) {
@@ -60,7 +65,8 @@
       <div class="options-container">
         @for (option of poll.options; track $index) {
         <div class="option-container">
-          <button class="option-button">
+          <button class="option-button"
+                  (click)="doVote(poll.id, $index)">
             {{option.optText}} ({{option.voteCount}} votes)
           </button>
         </div>

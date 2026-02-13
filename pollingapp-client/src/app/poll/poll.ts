@@ -79,4 +79,19 @@ export class PollComponent implements OnInit {
       ]
     }
   }
+
+  doVote(pollId: number, optionIndex: number) {
+    this.pollService.doVote(pollId, optionIndex).subscribe({
+      next: () => {
+        const poll = this.polls.find(p => p.id === pollId);
+        if (poll) {
+          poll.options[optionIndex].voteCount++;
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error voting: ", err);
+      }
+    })
+  }
 }
