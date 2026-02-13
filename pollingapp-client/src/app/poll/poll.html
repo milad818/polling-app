@@ -1,11 +1,58 @@
-<!-- <label> Question: </label>
-<input type="text" , placeholder="Type your question...">
-<button type="button" class="btn btn-primary">Create</button> -->
-
-
-<div class="container">
+<div class="app-container">
   <h1 class="app-title">Polling App</h1>
   <h3 class="app-instruction">Below you can create and manage your own polls.</h3>
+  <div class="new-poll-container">
+    <h4 class="new-poll-instruction">Create Poll</h4>
+
+    <form #pollForm="ngForm" class="new-poll-form" (ngSubmit)="createPoll()">
+      <div class="new-poll-question">
+        <input
+          type="text"
+          name="question"
+          [(ngModel)]="newPoll.question"
+          placeholder="Type your question..."
+          required
+          minlength="5"
+          #question="ngModel" />
+        @if (question.invalid && question.touched) {
+          <div class="error-message">
+            @if (question.errors?.['required']) {
+              <span>Question is required.</span>
+            }
+            @if (question.errors?.['minlength']) {
+              <span>Question must be at least 5 characters.</span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="new-poll-options">
+        @for (option of newPoll.options; track $index) {
+          <div class="option-input-wrapper">
+            <input
+              type="text"
+              [name]="'option' + $index"
+              [(ngModel)]="option.optText"
+              placeholder="Type your option..."
+              required
+              minlength="1"
+              #optionInput="ngModel" />
+            @if (optionInput.invalid && optionInput.touched) {
+              <div class="error-message">
+                <span>Option is required.</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="create-poll-button"
+        [disabled]="pollForm.invalid">Create Poll</button>
+    </form>
+  </div>
+  <h4 class="app-instruction">Available polls:</h4>
   @for(poll of polls; track poll.id){
   <div class="polls-container">
     <div class="poll-container">
