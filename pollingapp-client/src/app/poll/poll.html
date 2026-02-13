@@ -51,10 +51,28 @@
         }
       </div>
 
-      <button
-        type="submit"
-        class="create-poll-button"
-        [disabled]="pollForm.invalid">Create Poll</button>
+      <div class="form-buttons-container">
+        <div class="left-buttons">
+          <button
+            type="button"
+            class="remove-option-button"
+            (click)="removeOption()"
+            [disabled]="newPoll.options.length <= 2"
+            >Remove Option</button>
+          <button
+            type="button"
+            class="add-option-button"
+            (click)="addOption()"
+            [disabled]="newPoll.options.length >= 4"
+            >Add Option</button>
+        </div>
+        <div class="right-buttons">
+          <button
+            type="submit"
+            class="create-poll-button"
+            [disabled]="pollForm.invalid">Create Poll</button>
+        </div>
+      </div>
     </form>
   </div>
   <h4 class="app-instruction">Available polls:</h4>

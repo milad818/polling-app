@@ -94,4 +94,17 @@ export class PollComponent implements OnInit {
       }
     })
   }
+
+  // Increment number of options when creating a new poll (max 4)
+  addOption() {
+    if (this.newPoll.options.length < 4) {
+      this.newPoll.options.push({ optText: "", voteCount: 0 });
+    }
+  }
+
+  removeOption() {
+    if (this.newPoll.options.length > 2) {
+      this.newPoll.options.pop();
+    }
+  }
 }

@@ -280,10 +280,27 @@ input.ng-valid.ng-touched {
   outline-offset: 2px;
 }
 
-/* Create Poll Button */
-.create-poll-button {
+/* Form Buttons Container */
+.form-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
 
-  max-width: 8rem;
+.left-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.right-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Remove Option Button (Red) */
+.remove-option-button {
   display: inline-block;
   font-weight: 600;
   text-align: center;
@@ -297,19 +314,131 @@ input.ng-valid.ng-touched {
   transition: all 0.2s ease-in-out;
   text-decoration: none;
   white-space: nowrap;
-  color: green;
+  color: #dc3545;
   background-color: transparent;
-  border: 2px solid #6da128;
-  position: relative;
-  overflow: hidden;
+  border: 2px solid #dc3545;
+}
+
+.remove-option-button:hover {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.remove-option-button:active {
+  background-color: #bd2130;
+  border-color: #bd2130;
+  transform: translateY(0);
+}
+
+.remove-option-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+.remove-option-button:disabled:hover {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Add Option Button (Blue) */
+.add-option-button {
+  display: inline-block;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.6rem 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  white-space: nowrap;
+  color: #0d6efd;
+  background-color: transparent;
+  border: 2px solid #0d6efd;
+}
+
+.add-option-button:hover {
+  color: #fff;
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.add-option-button:active {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+  transform: translateY(0);
+}
+
+.add-option-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+.add-option-button:disabled:hover {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Create Poll Button (Green) */
+.create-poll-button {
+  display: inline-block;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.6rem 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  white-space: nowrap;
+  color: #28a745;
+  background-color: transparent;
+  border: 2px solid #28a745;
 }
 
 .create-poll-button:hover {
   color: #fff;
-  background-color: #238c1d;
-  border-color: #96ff74;
+  background-color: #28a745;
+  border-color: #28a745;
   transform: translateY(-1px);
-  box-shadow: 0 1 4px 12px rgba(13, 110, 253, 0.3);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.create-poll-button:active {
+  background-color: #218838;
+  border-color: #1e7e34;
+  transform: translateY(0);
 }
 
 .create-poll-button:disabled {
@@ -402,6 +531,28 @@ input.ng-valid.ng-touched {
   .option-button {
     width: 100%;
   }
+
+  .form-buttons-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .left-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .right-buttons {
+    width: 100%;
+  }
+
+  .remove-option-button,
+  .add-option-button,
+  .create-poll-button {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-size: 0.95rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -436,6 +587,13 @@ input.ng-valid.ng-touched {
   }
 
   .option-button {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.9rem;
+  }
+
+  .remove-option-button,
+  .add-option-button,
+  .create-poll-button {
     padding: 0.5rem 0.875rem;
     font-size: 0.9rem;
   }
