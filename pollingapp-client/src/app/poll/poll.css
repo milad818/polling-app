@@ -84,12 +84,12 @@
 }
 
 /* App Instruction */
-.app-instruction {
+h3.app-instruction {
   font-size: 1.25rem;
   font-weight: 400;
   color: #6c757d;
   margin-bottom: 2rem;
-  text-align: center;
+  text-align: left;
 }
 
 h4.app-instruction {
@@ -758,10 +758,6 @@ input.ng-valid.ng-touched {
     font-size: 1.1rem;
   }
 
-  h4.app-instruction {
-    font-size: 1.3rem;
-  }
-
   .new-poll-container {
     padding: 1.5rem;
   }
@@ -823,32 +819,6 @@ input.ng-valid.ng-touched {
     padding: 0.625rem 1rem;
     font-size: 0.95rem;
   }
-
-  .modal-content {
-    width: 95%;
-  }
-
-  .modal-header h3 {
-    font-size: 1.3rem;
-  }
-
-  .modal-body {
-    padding: 1.5rem 1.25rem;
-  }
-
-  .modal-body p {
-    font-size: 1rem;
-  }
-
-  .modal-footer {
-    padding: 1rem 1.25rem;
-    flex-wrap: wrap;
-  }
-
-  .modal-button {
-    min-width: 80px;
-    padding: 0.5rem 1.25rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -876,14 +846,6 @@ input.ng-valid.ng-touched {
     font-size: 1.5rem;
     top: 0.75rem;
     right: 0.75rem;
-  }
-
-  .app-instruction {
-    font-size: 1rem;
-  }
-
-  h4.app-instruction {
-    font-size: 1.2rem;
   }
 
   .new-poll-container {
@@ -914,28 +876,6 @@ input.ng-valid.ng-touched {
   .create-poll-button {
     padding: 0.5rem 0.875rem;
     font-size: 0.9rem;
-  }
-
-  .modal-header h3 {
-    font-size: 1.1rem;
-  }
-
-  .modal-body {
-    padding: 1.25rem 1rem;
-  }
-
-  .modal-body p {
-    font-size: 0.95rem;
-  }
-
-  .modal-footer {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .modal-button {
-    width: 100%;
-    min-width: unset;
   }
 }
 
