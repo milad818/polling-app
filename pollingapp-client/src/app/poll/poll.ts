@@ -26,6 +26,10 @@ export class PollComponent implements OnInit {
 
   polls: Poll[] = [];
 
+  // Confirmation modal state
+  showDeleteConfirmation = false;
+  pollToDelete: number | null = null;
+
   // Use constructor only for Dependency Injection
   constructor(private pollService: PollService, private cdr: ChangeDetectorRef) {
   }
@@ -106,5 +110,35 @@ export class PollComponent implements OnInit {
     if (this.newPoll.options.length > 2) {
       this.newPoll.options.pop();
     }
+  }
+
+  // Delete a poll from the database
+  deletePoll(pollId: number) {
+    this.pollToDelete = pollId;
+    this.showDeleteConfirmation = true;
+  }
+
+  // Confirm deletion
+  confirmDelete() {
+    if (this.pollToDelete !== null) {
+      this.pollService.deletePoll(this.pollToDelete).subscribe({
+        next: () => {
+          this.polls = this.polls.filter(p => p.id !== this.pollToDelete);
+          console.log('Poll deleted successfully');
+          this.cancelDelete();
+        },
+        error: (err) => {
+          console.error('Error deleting poll:', err);
+          this.cancelDelete();
+        }
+      });
+    }
+  }
+
+  // Cancel deletion
+  cancelDelete() {
+    this.showDeleteConfirmation = false;
+    this.pollToDelete = null;
+    this.cdr.detectChanges();
   }
 }

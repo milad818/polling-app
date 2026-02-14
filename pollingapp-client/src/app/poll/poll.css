@@ -1,3 +1,69 @@
+/* Fancy Header */
+.app-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 3rem 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.app-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: headerGlow 15s ease-in-out infinite;
+}
+
+@keyframes headerGlow {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(30px, 30px) rotate(180deg);
+  }
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.fancy-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+  animation: titleFloat 3s ease-in-out infinite;
+}
+
+@keyframes titleFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.header-subtitle {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 1rem 0 0 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  letter-spacing: 1px;
+}
+
 /* Container Styles */
 .container,
 .app-container {
@@ -187,6 +253,7 @@ input.ng-valid.ng-touched {
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .poll-container:hover {
@@ -195,12 +262,51 @@ input.ng-valid.ng-touched {
   transform: translateY(-2px);
 }
 
+/* Delete Poll Button */
+.delete-poll-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #6c757d;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: #6c757d;
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 0;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 10;
+  font-family: Arial, sans-serif;
+}
+
+.delete-poll-button:hover {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #ffffff;
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.delete-poll-button:active {
+  transform: scale(0.95) rotate(90deg);
+  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
 /* Poll Question */
+.poll-question,
 .poll-container > div:first-child {
   font-size: 1.5rem;
   font-weight: 600;
   color: #1a1a1a;
   margin-bottom: 1.25rem;
+  margin-right: 50px;
   line-height: 1.4;
 }
 
@@ -473,8 +579,172 @@ input.ng-valid.ng-touched {
   }
 }
 
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Delete Confirmation Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: modalFadeIn 0.2s ease-in-out;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  animation: modalSlideIn 0.3s ease-out;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e1e8ed;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
+  line-height: 0;
+}
+
+.modal-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 2rem 1.5rem;
+}
+
+.modal-body p {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+.modal-body p:last-child {
+  margin-bottom: 0;
+}
+
+.modal-warning {
+  font-size: 0.95rem !important;
+  color: #dc3545 !important;
+  font-weight: 500;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e1e8ed;
+}
+
+.modal-button {
+  padding: 0.625rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-width: 100px;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: #ffffff;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.confirm-button {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+.confirm-button:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.modal-button:active {
+  transform: translateY(0);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
+  .app-header {
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .fancy-title {
+    font-size: 2.5rem;
+  }
+
+  .header-subtitle {
+    font-size: 1.1rem;
+  }
+
   .container,
   .app-container {
     padding: 0 15px;
@@ -553,11 +823,59 @@ input.ng-valid.ng-touched {
     padding: 0.625rem 1rem;
     font-size: 0.95rem;
   }
+
+  .modal-content {
+    width: 95%;
+  }
+
+  .modal-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .modal-body p {
+    font-size: 1rem;
+  }
+
+  .modal-footer {
+    padding: 1rem 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .modal-button {
+    min-width: 80px;
+    padding: 0.5rem 1.25rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .app-header {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .fancy-title {
+    font-size: 2rem;
+  }
+
+  .header-subtitle {
+    font-size: 1rem;
+    margin-top: 0.75rem;
+  }
+
   .app-title {
     font-size: 1.75rem;
+  }
+
+  .delete-poll-button {
+    width: 32px;
+    height: 32px;
+    font-size: 1.5rem;
+    top: 0.75rem;
+    right: 0.75rem;
   }
 
   .app-instruction {
@@ -596,6 +914,28 @@ input.ng-valid.ng-touched {
   .create-poll-button {
     padding: 0.5rem 0.875rem;
     font-size: 0.9rem;
+  }
+
+  .modal-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .modal-body {
+    padding: 1.25rem 1rem;
+  }
+
+  .modal-body p {
+    font-size: 0.95rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .modal-button {
+    width: 100%;
+    min-width: unset;
   }
 }
 

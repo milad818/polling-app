@@ -57,4 +57,8 @@ public class PollService {
         pollRepository.save(poll);
 
     }
+
+    public void deletePoll(Long id) {
+        pollRepository.deleteById(id);
+    }
 }

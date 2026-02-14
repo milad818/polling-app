@@ -51,4 +51,10 @@ public class PollController {
     public void doVote (@RequestBody Vote vote) {
         pollService.doVote(vote.getPollId(), vote.getOptionIndex());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePoll(@PathVariable Long id) {
+        pollService.deletePoll(id);
+        return ResponseEntity.noContent().build();
+    }
 }
