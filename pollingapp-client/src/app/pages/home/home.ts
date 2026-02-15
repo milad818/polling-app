@@ -1,10 +1,18 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { PollComponent } from '../../poll/poll';
+import { ProfileComponent } from '../../profile/profile';
 
 @Component({
   selector: 'app-home',
-  imports: [PollComponent],
+  imports: [PollComponent, ProfileComponent],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
-export class HomeComponent {}
+export class HomeComponent {
+  constructor(private router: Router) {}
+
+  logout(): void {
+    this.router.navigate(['/login']);
+  }
+}

@@ -1,0 +1,128 @@
+<div class="profile-card">
+
+  <!-- Profile Picture -->
+  <div class="profile-picture-section">
+    <div class="profile-picture-wrapper">
+      @if (profile.profilePicture) {
+        <img [src]="profile.profilePicture" alt="Profile Picture" class="profile-picture" />
+      } @else {
+        <div class="profile-picture-placeholder">
+          <span class="placeholder-icon">&#128100;</span>
+        </div>
+      }
+      <label class="upload-overlay" for="profilePicUpload">
+        <span class="upload-icon">&#128247;</span>
+      </label>
+      <input
+        type="file"
+        id="profilePicUpload"
+        accept="image/*"
+        (change)="onProfilePictureUpload($event)"
+        hidden
+      />
+    </div>
+    <h3 class="profile-name">{{ profile.firstName }} {{ profile.lastName }}</h3>
+  </div>
+
+  <!-- Profile Info -->
+  <div class="profile-info">
+    <div class="info-row">
+      <span class="info-label">&#9993; Email</span>
+      <span class="info-value">{{ profile.email }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">&#127874; Birthday</span>
+      <span class="info-value">{{ profile.dateOfBirth }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">&#128241; Phone</span>
+      <span class="info-value">{{ profile.phoneNumber }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">&#128205; Address</span>
+      <span class="info-value">{{ profile.address }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">&#128221; Bio</span>
+      <span class="info-value bio-text">{{ profile.bio }}</span>
+    </div>
+  </div>
+
+  <!-- Edit Button -->
+  <button class="edit-profile-btn" type="button" (click)="openEditModal()">
+    &#9998; Edit Profile
+  </button>
+
+</div>
+
+<!-- Edit Profile Modal -->
+@if (showEditModal) {
+  <div class="modal-overlay" (click)="cancelEdit()">
+    <div class="edit-modal" (click)="$event.stopPropagation()">
+
+      <div class="edit-modal-header">
+        <h3>Edit Profile</h3>
+        <button class="modal-close-btn" type="button" (click)="cancelEdit()">&times;</button>
+      </div>
+
+      <div class="edit-modal-body">
+        <!-- Picture Edit -->
+        <div class="edit-picture-section">
+          <div class="edit-picture-wrapper">
+            @if (editProfile.profilePicture) {
+              <img [src]="editProfile.profilePicture" alt="Profile" class="edit-picture" />
+            } @else {
+              <div class="edit-picture-placeholder">&#128100;</div>
+            }
+          </div>
+          <label class="change-photo-btn" for="editProfilePic">Change Photo</label>
+          <input
+            type="file"
+            id="editProfilePic"
+            accept="image/*"
+            (change)="onProfilePictureChange($event)"
+            hidden
+          />
+        </div>
+
+        <!-- Form Fields -->
+        <div class="edit-form">
+          <div class="form-group">
+            <label for="editFirstName">First Name</label>
+            <input id="editFirstName" type="text" [(ngModel)]="editProfile.firstName" />
+          </div>
+          <div class="form-group">
+            <label for="editLastName">Last Name</label>
+            <input id="editLastName" type="text" [(ngModel)]="editProfile.lastName" />
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input id="editEmail" type="email" [(ngModel)]="editProfile.email" />
+          </div>
+          <div class="form-group">
+            <label for="editDob">Date of Birth</label>
+            <input id="editDob" type="date" [(ngModel)]="editProfile.dateOfBirth" />
+          </div>
+          <div class="form-group">
+            <label for="editPhone">Phone Number</label>
+            <input id="editPhone" type="tel" [(ngModel)]="editProfile.phoneNumber" />
+          </div>
+          <div class="form-group">
+            <label for="editAddress">Address</label>
+            <input id="editAddress" type="text" [(ngModel)]="editProfile.address" />
+          </div>
+          <div class="form-group">
+            <label for="editBio">Bio</label>
+            <textarea id="editBio" [(ngModel)]="editProfile.bio" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-modal-footer">
+        <button class="cancel-btn" type="button" (click)="cancelEdit()">Cancel</button>
+        <button class="confirm-btn" type="button" (click)="confirmEdit()">Save Changes</button>
+      </div>
+
+    </div>
+  </div>
+}

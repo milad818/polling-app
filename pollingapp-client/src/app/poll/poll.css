@@ -1,75 +1,7 @@
-/* Fancy Header */
-.app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 3rem 2rem;
-  margin-bottom: 3rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  position: relative;
-  overflow: hidden;
-}
-
-.app-header::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  animation: headerGlow 15s ease-in-out infinite;
-}
-
-@keyframes headerGlow {
-  0%, 100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate(30px, 30px) rotate(180deg);
-  }
-}
-
-.header-content {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.fancy-title {
-  font-size: 3.5rem;
-  font-weight: 900;
-  color: #ffffff;
-  margin: 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  letter-spacing: 2px;
-  animation: titleFloat 3s ease-in-out infinite;
-}
-
-@keyframes titleFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.header-subtitle {
-  font-size: 1.25rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 1rem 0 0 0;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-  letter-spacing: 1px;
-}
-
 /* Container Styles */
 .container,
 .app-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -732,23 +664,6 @@ input.ng-valid.ng-touched {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .app-header {
-    padding: 2rem 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .fancy-title {
-    font-size: 2.5rem;
-  }
-
-  .header-subtitle {
-    font-size: 1.1rem;
-  }
-
-  .container,
-  .app-container {
-    padding: 0 15px;
-  }
 
   .app-title {
     font-size: 2rem;
@@ -822,23 +737,6 @@ input.ng-valid.ng-touched {
 }
 
 @media (max-width: 480px) {
-  .app-header {
-    padding: 1.5rem 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .fancy-title {
-    font-size: 2rem;
-  }
-
-  .header-subtitle {
-    font-size: 1rem;
-    margin-top: 0.75rem;
-  }
-
-  .app-title {
-    font-size: 1.75rem;
-  }
 
   .delete-poll-button {
     width: 32px;
