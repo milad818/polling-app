@@ -1,0 +1,163 @@
+<div class="login-page">
+
+  <!-- Infinite Tech Scroll Banner -->
+  <div class="tech-scroll-banner">
+    <div class="tech-scroll-track">
+      @for (tech of techItems; track tech) {
+        <span class="tech-item">{{ tech }}</span>
+      }
+      @for (tech of techItems; track tech; let i = $index) {
+        <span class="tech-item duplicate">{{ tech }}</span>
+      }
+    </div>
+  </div>
+
+  <!-- Animated Title -->
+  <div class="login-title-container">
+    <h1 class="login-title">
+      <span class="title-icon">&#9881;</span>
+      <span class="title-text">PollingApp</span>
+      <span class="title-icon">&#9881;</span>
+    </h1>
+    <p class="login-subtitle">Create polls, share opinions, make decisions</p>
+  </div>
+
+  <!-- Auth Card -->
+  <div class="auth-wrapper">
+    <div class="auth-card" [class.flipped]="isSignUp">
+
+      <!-- Sign In Panel -->
+      <div class="auth-panel sign-in-panel">
+        <h2 class="panel-title">Welcome Back</h2>
+        <p class="panel-subtitle">Sign in to your account</p>
+
+        <form #signInForm="ngForm" (ngSubmit)="onSignIn()" class="auth-form">
+          <div class="input-group">
+            <span class="input-icon">&#9993;</span>
+            <input
+              type="email"
+              name="signInEmail"
+              [(ngModel)]="signInEmail"
+              placeholder="Email address"
+              required
+              email
+              #siEmail="ngModel"
+            />
+          </div>
+          @if (siEmail.invalid && siEmail.touched) {
+            <span class="field-error">Please enter a valid email</span>
+          }
+
+          <div class="input-group">
+            <span class="input-icon">&#128274;</span>
+            <input
+              type="password"
+              name="signInPassword"
+              [(ngModel)]="signInPassword"
+              placeholder="Password"
+              required
+              minlength="4"
+              #siPassword="ngModel"
+            />
+          </div>
+          @if (siPassword.invalid && siPassword.touched) {
+            <span class="field-error">Password is required (min 4 characters)</span>
+          }
+
+          <button type="submit" class="auth-btn" [disabled]="signInForm.invalid">
+            Sign In
+          </button>
+        </form>
+
+        <div class="toggle-section">
+          <p>Don't have an account?
+            <button type="button" class="toggle-btn" (click)="toggleMode()">Sign Up</button>
+          </p>
+        </div>
+      </div>
+
+      <!-- Sign Up Panel -->
+      <div class="auth-panel sign-up-panel">
+        <h2 class="panel-title">Create Account</h2>
+        <p class="panel-subtitle">Join the community</p>
+
+        <form #signUpForm="ngForm" (ngSubmit)="onSignUp()" class="auth-form">
+          <div class="input-group">
+            <span class="input-icon">&#128100;</span>
+            <input
+              type="text"
+              name="signUpName"
+              [(ngModel)]="signUpName"
+              placeholder="Full name"
+              required
+              minlength="2"
+              #suName="ngModel"
+            />
+          </div>
+          @if (suName.invalid && suName.touched) {
+            <span class="field-error">Name is required (min 2 characters)</span>
+          }
+
+          <div class="input-group">
+            <span class="input-icon">&#9993;</span>
+            <input
+              type="email"
+              name="signUpEmail"
+              [(ngModel)]="signUpEmail"
+              placeholder="Email address"
+              required
+              email
+              #suEmail="ngModel"
+            />
+          </div>
+          @if (suEmail.invalid && suEmail.touched) {
+            <span class="field-error">Please enter a valid email</span>
+          }
+
+          <div class="input-group">
+            <span class="input-icon">&#128274;</span>
+            <input
+              type="password"
+              name="signUpPassword"
+              [(ngModel)]="signUpPassword"
+              placeholder="Password"
+              required
+              minlength="6"
+              #suPassword="ngModel"
+            />
+          </div>
+          @if (suPassword.invalid && suPassword.touched) {
+            <span class="field-error">Password must be at least 6 characters</span>
+          }
+
+          <div class="input-group">
+            <span class="input-icon">&#128275;</span>
+            <input
+              type="password"
+              name="signUpConfirmPassword"
+              [(ngModel)]="signUpConfirmPassword"
+              placeholder="Confirm password"
+              required
+              #suConfirm="ngModel"
+            />
+          </div>
+          @if (suConfirm.touched && signUpConfirmPassword !== signUpPassword) {
+            <span class="field-error">Passwords do not match</span>
+          }
+
+          <button type="submit" class="auth-btn" [disabled]="signUpForm.invalid || signUpPassword !== signUpConfirmPassword">
+            Sign Up
+          </button>
+        </form>
+
+        <div class="toggle-section">
+          <p>Already have an account?
+            <button type="button" class="toggle-btn" (click)="toggleMode()">Sign In</button>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
