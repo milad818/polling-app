@@ -16,7 +16,7 @@ A modern, full-stack polling application that allows users to create, manage, an
 - **Spring Web MVC** - RESTful API development
 - **MySQL** - Relational database
 - **Lombok** - Reduce boilerplate code
-- **Java 17** - Programming language
+- **Java 21** - Programming language
 
 ### Frontend
 - **Angular 21** - Modern TypeScript-based framework
