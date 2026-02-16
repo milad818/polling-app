@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { PollComponent } from '../../poll/poll';
-import { ProfileComponent } from '../../profile/profile';
+import { PollComponent } from '../../components/poll/poll';
+import { ProfileComponent } from '../../components/profile/profile';
 
 @Component({
   selector: 'app-home',
