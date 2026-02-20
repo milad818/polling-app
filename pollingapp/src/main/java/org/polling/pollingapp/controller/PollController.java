@@ -1,11 +1,14 @@
 package org.polling.pollingapp.controller;
 
 import org.polling.pollingapp.model.Poll;
+import org.polling.pollingapp.model.User;
 import org.polling.pollingapp.request.Vote;
 import org.polling.pollingapp.services.PollService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -21,10 +24,10 @@ public class PollController {
         this.pollService = pollService;
     }
 
-    // Below is defined a controller method to create a new poll in the table
+    // Create a new poll - requires authentication, sets the owner automatically
     @PostMapping
-    public Poll createPoll(@RequestBody Poll poll) {
-        return pollService.savePoll(poll);
+    public Poll createPoll(@RequestBody Poll poll, @AuthenticationPrincipal User currentUser) {
+        return pollService.savePoll(poll, currentUser);
     }
 
     // If you put a URL in both, they concatenate (join together)
@@ -47,14 +50,34 @@ public class PollController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/vote")
-    public void doVote (@RequestBody Vote vote) {
-        pollService.doVote(vote.getPollId(), vote.getOptionIndex());
+    // Get all polls created by the authenticated user
+    @GetMapping("/my")
+    public List<Poll> getMyPolls(@AuthenticationPrincipal User currentUser) {
+        return pollService.getPollsByOwner(currentUser.getId());
     }
 
+    // Update a poll - only the owner can update their poll
+    @PutMapping("/{id}")
+    public ResponseEntity<Poll> updatePoll(@PathVariable Long id, @RequestBody Poll poll,
+                                           @AuthenticationPrincipal User currentUser) {
+        Poll updated = pollService.updatePoll(id, poll, currentUser);
+        return ResponseEntity.ok(updated);
+    }
+
+    // Vote on a poll - supports both authenticated and anonymous voting
+    // Tracks votes by user ID (if logged in) and IP address
+    @PostMapping("/vote")
+    public void doVote(@RequestBody Vote vote,
+                       @AuthenticationPrincipal User currentUser,
+                       HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
+        pollService.doVote(vote.getPollId(), vote.getOptionIndex(), currentUser, ipAddress);
+    }
+
+    // Delete a poll - only the owner can delete their poll
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePoll(@PathVariable Long id) {
-        pollService.deletePoll(id);
+    public ResponseEntity<Void> deletePoll(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
+        pollService.deletePoll(id, currentUser);
         return ResponseEntity.noContent().build();
     }
 }

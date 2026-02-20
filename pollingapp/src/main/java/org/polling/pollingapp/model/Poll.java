@@ -1,9 +1,11 @@
 package org.polling.pollingapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,5 +21,13 @@ public class Poll {
     @ElementCollection  // A collection of non-entity values that belong entirely to this entity.
     private List<OptionVote> options = new ArrayList<>();
 
+    // The user who created this poll
+    // @ManyToOne by itself is enough to trigger the tables, even if there are other types/tables involved
+    // JoinColumn() is used to specify a custom name, otherwise JPA auto-generates column name
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_id")
+    @JsonIgnoreProperties({"passwordHash", "bio", "avatarUrl", "createdAt"})
+    private User owner;
 
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
