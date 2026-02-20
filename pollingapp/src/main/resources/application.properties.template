@@ -15,3 +15,10 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 # 4. Set DB_PASSWORD environment variable with your MySQL password
 #    Windows: $env:DB_PASSWORD="your_password"
 #    Linux/Mac: export DB_PASSWORD="your_password"
+# 5. Set JWT_SECRET environment variable with a secret key (min 32 chars)
+#    Windows: $env:JWT_SECRET="your_secret_key_at_least_32_chars"
+#    Linux/Mac: export JWT_SECRET="your_secret_key_at_least_32_chars"
+
+# JWT CONFIGURATION
+jwt.secret=${JWT_SECRET:myDefaultSuperSecretKeyThatIsAtLeast32CharsLong!}
+jwt.expiration-ms=86400000
