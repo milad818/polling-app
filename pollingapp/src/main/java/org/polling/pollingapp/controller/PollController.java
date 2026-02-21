@@ -1,9 +1,11 @@
 package org.polling.pollingapp.controller;
 
 import org.polling.pollingapp.model.Poll;
+import org.polling.pollingapp.model.User;
 import org.polling.pollingapp.request.Vote;
 import org.polling.pollingapp.services.PollService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,10 +23,10 @@ public class PollController {
         this.pollService = pollService;
     }
 
-    // Below is defined a controller method to create a new poll in the table
+    // Create a new poll - requires authentication, sets the owner automatically
     @PostMapping
-    public Poll createPoll(@RequestBody Poll poll) {
-        return pollService.savePoll(poll);
+    public Poll createPoll(@RequestBody Poll poll, @AuthenticationPrincipal User currentUser) {
+        return pollService.savePoll(poll, currentUser);
     }
 
     // If you put a URL in both, they concatenate (join together)
@@ -40,11 +42,21 @@ public class PollController {
         return pollService.getPollById(id)
                 // Extracts the Poll from Optional<Poll> and wraps it in a ResponseEntity
                 .map(ResponseEntity::ok)
-                // Manual extraction (ugly)
-                //if (pollRepository.findById(id).isPresent()) {
-                //    return ResponseEntity.ok(pollRepository.findById(id).get());
-                //}
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Get all polls created by the authenticated user
+    @GetMapping("/my")
+    public List<Poll> getMyPolls(@AuthenticationPrincipal User currentUser) {
+        return pollService.getPollsByOwner(currentUser.getId());
+    }
+
+    // Update a poll - only the owner can update their poll
+    @PutMapping("/{id}")
+    public ResponseEntity<Poll> updatePoll(@PathVariable Long id, @RequestBody Poll poll,
+                                           @AuthenticationPrincipal User currentUser) {
+        Poll updated = pollService.updatePoll(id, poll, currentUser);
+        return ResponseEntity.ok(updated);
     }
 
     @PostMapping("/vote")
@@ -52,9 +64,10 @@ public class PollController {
         pollService.doVote(vote.getPollId(), vote.getOptionIndex());
     }
 
+    // Delete a poll - only the owner can delete their poll
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePoll(@PathVariable Long id) {
-        pollService.deletePoll(id);
+    public ResponseEntity<Void> deletePoll(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
+        pollService.deletePoll(id, currentUser);
         return ResponseEntity.noContent().build();
     }
 }
