@@ -2,6 +2,7 @@ package org.polling.pollingapp.services;
 
 import org.polling.pollingapp.model.OptionVote;
 import org.polling.pollingapp.model.Poll;
+import org.polling.pollingapp.model.User;
 import org.polling.pollingapp.repositories.PollRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,9 @@ public class PollService {
         this.pollRepository = pollRepository;
     }
 
-    public Poll savePoll(Poll poll) {
+    // Save a poll and assign it to the authenticated owner
+    public Poll savePoll(Poll poll, User owner) {
+        poll.setOwner(owner);
         return pollRepository.save(poll);
     }
 
@@ -30,6 +33,25 @@ public class PollService {
 
     public Optional<Poll> getPollById(Long id) {
         return pollRepository.findById(id);
+    }
+
+    // Get all polls created by a specific user
+    public List<Poll> getPollsByOwner(Long ownerId) {
+        return pollRepository.findByOwnerId(ownerId);
+    }
+
+    // Update a poll only if the authenticated user is the owner
+    public Poll updatePoll(Long pollId, Poll updatedPoll, User currentUser) {
+        Poll existingPoll = getPollById(pollId)
+                .orElseThrow(() -> new RuntimeException("Poll not found!"));
+
+        if (!existingPoll.getOwner().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("You are not authorized to edit this poll!");
+        }
+
+        existingPoll.setQuestion(updatedPoll.getQuestion());
+        existingPoll.setOptions(updatedPoll.getOptions());
+        return pollRepository.save(existingPoll);
     }
 
     public void doVote(Long pollId, int optionIndex) {
@@ -58,7 +80,15 @@ public class PollService {
 
     }
 
-    public void deletePoll(Long id) {
+    // Delete a poll only if the authenticated user is the owner
+    public void deletePoll(Long id, User currentUser) {
+        Poll poll = getPollById(id)
+                .orElseThrow(() -> new RuntimeException("Poll not found!"));
+
+        if (!poll.getOwner().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("You are not authorized to delete this poll!");
+        }
+
         pollRepository.deleteById(id);
     }
 }
