@@ -10,6 +10,7 @@ import org.polling.pollingapp.model.OptionVote;
 import org.polling.pollingapp.model.Poll;
 import org.polling.pollingapp.model.User;
 import org.polling.pollingapp.repositories.PollRepository;
+import org.polling.pollingapp.repositories.VoteRecordRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,9 @@ class PollServiceOwnershipTest {
 
     @Mock
     private PollRepository pollRepository;
+
+    @Mock
+    private VoteRecordRepository voteRecordRepository;
 
     @InjectMocks
     private PollService pollService;
