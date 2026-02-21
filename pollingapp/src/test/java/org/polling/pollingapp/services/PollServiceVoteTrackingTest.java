@@ -20,7 +20,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,16 +54,18 @@ class PollServiceVoteTrackingTest {
         OptionVote opt2 = new OptionVote();
         opt2.setOptText("Blue");
         opt2.setVoteCount(0L);
-        poll.setOptions(new ArrayList<>(List.of(opt1, opt2)));
+        OptionVote opt3 = new OptionVote();
+        opt3.setOptText("Green");
+        opt3.setVoteCount(0L);
+        poll.setOptions(new ArrayList<>(List.of(opt1, opt2, opt3)));
     }
 
     @Test
-    void doVote_authenticatedUser_recordsVote() {
-        when(voteRecordRepository.existsByPollIdAndIpAddress(1L, "127.0.0.1")).thenReturn(false);
-        when(voteRecordRepository.existsByPollIdAndUserId(1L, 10L)).thenReturn(false);
+    void doVote_firstVote_incrementsAndCreatesRecord() {
         when(pollRepository.findById(1L)).thenReturn(Optional.of(poll));
+        when(voteRecordRepository.findByPollIdAndUserId(1L, 10L)).thenReturn(Optional.empty());
 
-        pollService.doVote(1L, 0, voter, "127.0.0.1");
+        pollService.doVote(1L, 0, voter);
 
         assertThat(poll.getOptions().get(0).getVoteCount()).isEqualTo(1L);
         verify(pollRepository).save(poll);
@@ -72,60 +73,71 @@ class PollServiceVoteTrackingTest {
     }
 
     @Test
-    void doVote_anonymousUser_recordsVote() {
-        when(voteRecordRepository.existsByPollIdAndIpAddress(1L, "192.168.1.1")).thenReturn(false);
+    void doVote_changeVote_decrementsOldIncrementsNew() {
+        // Voter previously voted for option 0
+        VoteRecord existing = new VoteRecord();
+        existing.setId(100L);
+        existing.setPoll(poll);
+        existing.setUser(voter);
+        existing.setOptionIndex(0);
+
+        poll.getOptions().get(0).setVoteCount(5L); // 5 votes on Red
+        poll.getOptions().get(1).setVoteCount(3L); // 3 votes on Blue
+
         when(pollRepository.findById(1L)).thenReturn(Optional.of(poll));
+        when(voteRecordRepository.findByPollIdAndUserId(1L, 10L)).thenReturn(Optional.of(existing));
 
-        pollService.doVote(1L, 1, null, "192.168.1.1");
+        pollService.doVote(1L, 1, voter);
 
-        assertThat(poll.getOptions().get(1).getVoteCount()).isEqualTo(1L);
+        // Red decremented 5 -> 4, Blue incremented 3 -> 4
+        assertThat(poll.getOptions().get(0).getVoteCount()).isEqualTo(4L);
+        assertThat(poll.getOptions().get(1).getVoteCount()).isEqualTo(4L);
+        assertThat(existing.getOptionIndex()).isEqualTo(1); // record updated
+        verify(voteRecordRepository).save(existing);
         verify(pollRepository).save(poll);
-        verify(voteRecordRepository).save(any(VoteRecord.class));
     }
 
     @Test
-    void doVote_duplicateIp_throwsException() {
-        when(voteRecordRepository.existsByPollIdAndIpAddress(1L, "10.0.0.1")).thenReturn(true);
+    void doVote_sameOption_doesNothing() {
+        VoteRecord existing = new VoteRecord();
+        existing.setOptionIndex(0);
 
-        assertThatThrownBy(() -> pollService.doVote(1L, 0, voter, "10.0.0.1"))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("already voted");
+        poll.getOptions().get(0).setVoteCount(5L);
 
-        verify(pollRepository, never()).save(any());
-        verify(voteRecordRepository, never()).save(any());
-    }
+        when(pollRepository.findById(1L)).thenReturn(Optional.of(poll));
+        when(voteRecordRepository.findByPollIdAndUserId(1L, 10L)).thenReturn(Optional.of(existing));
 
-    @Test
-    void doVote_duplicateUser_throwsException() {
-        when(voteRecordRepository.existsByPollIdAndIpAddress(1L, "172.16.0.1")).thenReturn(false);
-        when(voteRecordRepository.existsByPollIdAndUserId(1L, 10L)).thenReturn(true);
+        pollService.doVote(1L, 0, voter);
 
-        assertThatThrownBy(() -> pollService.doVote(1L, 0, voter, "172.16.0.1"))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("already voted");
-
+        // Nothing changed
+        assertThat(poll.getOptions().get(0).getVoteCount()).isEqualTo(5L);
         verify(pollRepository, never()).save(any());
         verify(voteRecordRepository, never()).save(any());
     }
 
     @Test
     void doVote_invalidOptionIndex_throwsException() {
-        when(voteRecordRepository.existsByPollIdAndIpAddress(1L, "127.0.0.1")).thenReturn(false);
-        when(voteRecordRepository.existsByPollIdAndUserId(1L, 10L)).thenReturn(false);
         when(pollRepository.findById(1L)).thenReturn(Optional.of(poll));
 
-        assertThatThrownBy(() -> pollService.doVote(1L, 5, voter, "127.0.0.1"))
+        assertThatThrownBy(() -> pollService.doVote(1L, 5, voter))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Invalid option index");
+    }
+
+    @Test
+    void doVote_negativeIndex_throwsException() {
+        when(pollRepository.findById(1L)).thenReturn(Optional.of(poll));
+
+        assertThatThrownBy(() -> pollService.doVote(1L, -1, voter))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Invalid option index");
     }
 
     @Test
     void doVote_pollNotFound_throwsException() {
-        when(voteRecordRepository.existsByPollIdAndIpAddress(99L, "127.0.0.1")).thenReturn(false);
-        when(voteRecordRepository.existsByPollIdAndUserId(99L, 10L)).thenReturn(false);
         when(pollRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> pollService.doVote(99L, 0, voter, "127.0.0.1"))
+        assertThatThrownBy(() -> pollService.doVote(99L, 0, voter))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Poll not found");
     }

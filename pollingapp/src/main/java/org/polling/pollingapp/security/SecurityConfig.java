@@ -36,7 +36,7 @@ public class SecurityConfig {
                 // Public endpoints - no authentication required
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/polls/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/polls/vote").permitAll() // Anonymous voting allowed
+                .requestMatchers(HttpMethod.POST, "/api/polls/vote").authenticated()
                 // Protected endpoints - authentication required
                 .requestMatchers(HttpMethod.POST, "/api/polls").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/polls/**").authenticated()

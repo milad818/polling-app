@@ -59,20 +59,10 @@ public class PollService {
         return pollRepository.save(existingPoll);
     }
 
-    // Vote on a poll - enforces one-vote-per-user and one-vote-per-IP
-    // user can be null for anonymous voting
+    // Vote on a poll - only authenticated users can vote
+    // If user already voted, their old vote is moved to the new option
     @Transactional
-    public void doVote(Long pollId, int optionIndex, User user, String ipAddress) {
-        // Check if this IP has already voted on this poll
-        if (voteRecordRepository.existsByPollIdAndIpAddress(pollId, ipAddress)) {
-            throw new RuntimeException("You have already voted on this poll!");
-        }
-
-        // If user is logged in, also check by user ID
-        if (user != null && voteRecordRepository.existsByPollIdAndUserId(pollId, user.getId())) {
-            throw new RuntimeException("You have already voted on this poll!");
-        }
-
+    public void doVote(Long pollId, int optionIndex, User user) {
         // Get poll from DB
         Poll poll = getPollById(pollId)
                 .orElseThrow(() -> new RuntimeException("Poll not found!"));
@@ -81,26 +71,42 @@ public class PollService {
         List<OptionVote> options = poll.getOptions();
 
         // If index for vote invalid, throw error
-        if(optionIndex < 0 || optionIndex >= options.size()) {
+        if (optionIndex < 0 || optionIndex >= options.size()) {
             throw new IllegalArgumentException("Invalid option index!");
         }
 
-        // Get the selected option
-        OptionVote selectedOption = options.get(optionIndex);
+        // Check if user has already voted on this poll
+        Optional<VoteRecord> existingVote = voteRecordRepository.findByPollIdAndUserId(pollId, user.getId());
 
-        // Increment vote for the selected option
-        selectedOption.setVoteCount(selectedOption.getVoteCount() + 1);
+        if (existingVote.isPresent()) {
+            VoteRecord record = existingVote.get();
+            int oldIndex = record.getOptionIndex();
 
-        // Save incremented option
+            // If voting for the same option, nothing to do
+            if (oldIndex == optionIndex) {
+                return;
+            }
+
+            // Decrement old option
+            options.get(oldIndex).setVoteCount(options.get(oldIndex).getVoteCount() - 1);
+
+            // Update the record to the new option
+            record.setOptionIndex(optionIndex);
+            voteRecordRepository.save(record);
+        } else {
+            // First vote — create a new record
+            VoteRecord voteRecord = new VoteRecord();
+            voteRecord.setPoll(poll);
+            voteRecord.setUser(user);
+            voteRecord.setOptionIndex(optionIndex);
+            voteRecordRepository.save(voteRecord);
+        }
+
+        // Increment the new option
+        options.get(optionIndex).setVoteCount(options.get(optionIndex).getVoteCount() + 1);
+
+        // Save poll with updated vote counts
         pollRepository.save(poll);
-
-        // Record the vote for tracking
-        VoteRecord voteRecord = new VoteRecord();
-        voteRecord.setPoll(poll);
-        voteRecord.setUser(user); // null for anonymous voters
-        voteRecord.setOptionIndex(optionIndex);
-        voteRecord.setIpAddress(ipAddress);
-        voteRecordRepository.save(voteRecord);
     }
 
     // Delete a poll only if the authenticated user is the owner
