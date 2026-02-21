@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -59,9 +60,14 @@ public class PollController {
         return ResponseEntity.ok(updated);
     }
 
+    // Vote on a poll - supports both authenticated and anonymous voting
+    // Tracks votes by user ID (if logged in) and IP address
     @PostMapping("/vote")
-    public void doVote (@RequestBody Vote vote) {
-        pollService.doVote(vote.getPollId(), vote.getOptionIndex());
+    public void doVote(@RequestBody Vote vote,
+                       @AuthenticationPrincipal User currentUser,
+                       HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
+        pollService.doVote(vote.getPollId(), vote.getOptionIndex(), currentUser, ipAddress);
     }
 
     // Delete a poll - only the owner can delete their poll
