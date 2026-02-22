@@ -36,6 +36,8 @@ public class User {
     @Size(max = 255)
     private String bio;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String avatarUrl;
 
     @Column(nullable = false, updatable = false)
