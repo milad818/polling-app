@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -92,6 +92,7 @@ export class LoginComponent {
 
   private router = inject(Router);
   private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   toggleMode(): void {
     this.isSignUp = !this.isSignUp;
@@ -143,11 +144,13 @@ export class LoginComponent {
     this.authService.login(this.signInEmail, this.signInPassword).subscribe({
       next: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.router.navigate(['/home']);
       },
       error: (err) => {
         this.isLoading = false;
         this.errorMessage = err.error?.message || err.error || 'Invalid email or password!';
+        this.cdr.detectChanges();
       },
     });
   }
@@ -160,11 +163,13 @@ export class LoginComponent {
     this.authService.register(this.signUpEmail, this.signUpPassword).subscribe({
       next: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.router.navigate(['/home']);
       },
       error: (err) => {
         this.isLoading = false;
         this.errorMessage = err.error?.message || err.error || 'Registration failed!';
+        this.cdr.detectChanges();
       },
     });
   }
