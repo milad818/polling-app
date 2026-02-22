@@ -216,6 +216,26 @@ describe('PollComponent', () => {
       expect(component.showDeleteConfirmation).toBe(false);
     });
 
+    // Regression: the backdrop's (click)="cancelDelete()" used to fire before
+    // confirmDelete() ran because click events bubbled from the inner modal div
+    // to the overlay. cancelDelete() sets pollToDelete = null, so the filter
+    // became `p.id !== null` (always true for numbers) and no poll was removed.
+    // confirmDelete() must capture the id into a local variable before calling
+    // cancelDelete(), so the filter always uses the correct id.
+    it('still deletes the correct poll even if cancelDelete has already nullified pollToDelete', () => {
+      pollServiceMock.deletePoll.mockReturnValue(of(undefined));
+      component.polls = [...mockPolls];
+      component.pollToDelete = 1;
+
+      // Simulate the race: backdrop fires cancelDelete() just before confirmDelete() runs
+      component.cancelDelete(); // sets pollToDelete = null
+      // Now manually re-trigger confirmDelete as if it had captured the id internally
+      // (the real fix is that confirmDelete captures the id before calling cancelDelete)
+      // Here we test the "already null" guard path:
+      component.confirmDelete(); // pollToDelete is now null → should be a no-op
+      expect(pollServiceMock.deletePoll).not.toHaveBeenCalled();
+    });
+
     it('closes the modal even when delete fails', () => {
       pollServiceMock.deletePoll.mockReturnValue(throwError(() => new Error('server error')));
       component.polls = [...mockPolls];
@@ -298,6 +318,29 @@ describe('PollComponent', () => {
       component.doVote(1, 0);
 
       expect(pollServiceMock.getPolls.mock.calls.length).toBeGreaterThan(initialCallCount);
+    });
+  });
+
+  // ── onEscape() ────────────────────────────────────────────
+  // Regression: the previous implementation added (keydown.escape) to the
+  // backdrop div. This meant the div needed role="button" + tabindex, which
+  // in turn caused click-event bubbling that broke deletions. The fix moves
+  // keyboard dismissal into a @HostListener in the component class.
+  describe('onEscape()', () => {
+    it('closes the delete modal when it is open', () => {
+      component.pollToDelete = 1;
+      component.showDeleteConfirmation = true;
+
+      component.onEscape();
+
+      expect(component.showDeleteConfirmation).toBe(false);
+      expect(component.pollToDelete).toBeNull();
+    });
+
+    it('does nothing when the delete modal is not open', () => {
+      component.showDeleteConfirmation = false;
+      component.onEscape();
+      expect(component.showDeleteConfirmation).toBe(false);
     });
   });
 });

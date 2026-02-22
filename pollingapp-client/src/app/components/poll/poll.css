@@ -2,7 +2,8 @@
 .container,
 .app-container {
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* App Title */
@@ -255,7 +256,9 @@ input.ng-valid.ng-touched {
   cursor: pointer;
   border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .option-bar-wrapper:hover {
@@ -686,7 +689,6 @@ input.ng-valid.ng-touched {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-
   .app-title {
     font-size: 2rem;
   }
@@ -749,7 +751,6 @@ input.ng-valid.ng-touched {
 }
 
 @media (max-width: 480px) {
-
   .delete-poll-button {
     width: 32px;
     height: 32px;
@@ -809,7 +810,8 @@ input.ng-valid.ng-touched {
 
 /* Loading State */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

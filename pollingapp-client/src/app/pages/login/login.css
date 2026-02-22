@@ -42,17 +42,27 @@
 }
 
 @keyframes floatBubble {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(50px, -30px) scale(1.1); }
-  50% { transform: translate(-20px, 50px) scale(0.95); }
-  75% { transform: translate(30px, 20px) scale(1.05); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(50px, -30px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 50px) scale(0.95);
+  }
+  75% {
+    transform: translate(30px, 20px) scale(1.05);
+  }
 }
 
 /* ===== INFINITE TECH SCROLL BANNER ===== */
 .tech-scroll-banner {
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(90deg,
+  background: linear-gradient(
+    90deg,
     rgba(124, 58, 237, 0.2) 0%,
     rgba(6, 182, 212, 0.2) 50%,
     rgba(124, 58, 237, 0.2) 100%
@@ -117,8 +127,12 @@
 }
 
 @keyframes scrollTech {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* ===== ANIMATED TITLE ===== */
@@ -139,7 +153,9 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradientShift 4s ease infinite, titleFloat 3s ease-in-out infinite;
+  animation:
+    gradientShift 4s ease infinite,
+    titleFloat 3s ease-in-out infinite;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -173,18 +189,32 @@
 }
 
 @keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @keyframes titleFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 @keyframes spinGear {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes titleAppear {
@@ -199,8 +229,14 @@
 }
 
 @keyframes subtitleFade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== AUTH CARD WRAPPER ===== */
@@ -477,8 +513,14 @@
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== FORM FIELD ===== */

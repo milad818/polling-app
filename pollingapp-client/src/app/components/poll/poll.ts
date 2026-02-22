@@ -1,10 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, HostListener } from '@angular/core';
 import { PollService } from '../../services/poll.service';
 import { Poll } from '../../models/poll.model';
-import { OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -14,16 +12,15 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './poll.css',
 })
 export class PollComponent implements OnInit {
-
   // New poll is initialized with two options - a poll can have at least 2 options
   newPoll: Poll = {
     id: 0,
-    question: "",
+    question: '',
     options: [
-      { optText: "", voteCount: 0 },
-      { optText: "", voteCount: 0 }
-    ]
-  }
+      { optText: '', voteCount: 0 },
+      { optText: '', voteCount: 0 },
+    ],
+  };
 
   polls: Poll[] = [];
 
@@ -32,14 +29,13 @@ export class PollComponent implements OnInit {
   pollToDelete: number | null = null;
 
   // Track which option the current user voted for, per poll
-  userVotes: { [pollId: number]: number } = {};
+  // Record<K, V> is equivalent to { [key: K]: V } but is more idiomatic
+  // TypeScript — prefer it for plain key-value maps.
+  userVotes: Record<number, number> = {};
 
-  // Use constructor only for Dependency Injection
-  constructor(
-    private pollService: PollService,
-    private cdr: ChangeDetectorRef,
-    private authService: AuthService
-  ) {}
+  private pollService = inject(PollService);
+  private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
 
   // Use ngOnInit for initialization logic
   ngOnInit(): void {
@@ -82,15 +78,16 @@ export class PollComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error("Error fetching polls:", err)
-      }
-    })
+        console.error('Error fetching polls:', err);
+      },
+    });
   }
 
   // Create and inject a new poll into database
   createPoll() {
-    // Remove id field - let the database generate it
-    const { id, ...pollData } = this.newPoll;
+    // Prefix with _ to indicate the id is intentionally discarded — we let
+    // the database assign a real id on insert.
+    const { id: _id, ...pollData } = this.newPoll;
 
     this.pollService.createPoll(pollData as Poll).subscribe({
       next: (newPoll) => {
@@ -99,20 +96,20 @@ export class PollComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error("Error creating a new poll:", err)
-      }
-    })
+        console.error('Error creating a new poll:', err);
+      },
+    });
   }
 
   resetPoll() {
     this.newPoll = {
       id: 0,
-      question: "",
+      question: '',
       options: [
-        { optText: "", voteCount: 0 },
-        { optText: "", voteCount: 0 }
-      ]
-    }
+        { optText: '', voteCount: 0 },
+        { optText: '', voteCount: 0 },
+      ],
+    };
   }
 
   doVote(pollId: number, optionIndex: number) {
@@ -122,15 +119,15 @@ export class PollComponent implements OnInit {
         this.loadPolls();
       },
       error: (err) => {
-        console.error("Error voting: ", err);
-      }
-    })
+        console.error('Error voting: ', err);
+      },
+    });
   }
 
   // Increment number of options when creating a new poll (max 4)
   addOption() {
     if (this.newPoll.options.length < 4) {
-      this.newPoll.options.push({ optText: "", voteCount: 0 });
+      this.newPoll.options.push({ optText: '', voteCount: 0 });
     }
   }
 
@@ -151,14 +148,14 @@ export class PollComponent implements OnInit {
     if (this.pollToDelete !== null) {
       this.pollService.deletePoll(this.pollToDelete).subscribe({
         next: () => {
-          this.polls = this.polls.filter(p => p.id !== this.pollToDelete);
+          this.polls = this.polls.filter((p) => p.id !== this.pollToDelete);
           console.log('Poll deleted successfully');
           this.cancelDelete();
         },
         error: (err) => {
           console.error('Error deleting poll:', err);
           this.cancelDelete();
-        }
+        },
       });
     }
   }
@@ -168,5 +165,15 @@ export class PollComponent implements OnInit {
     this.showDeleteConfirmation = false;
     this.pollToDelete = null;
     this.cdr.detectChanges();
+  }
+
+  // Close the delete modal when the user presses Escape.
+  // Using @HostListener on the document means no div needs role="button" or
+  // tabindex just to handle keyboard dismissal — the component itself listens.
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.showDeleteConfirmation) {
+      this.cancelDelete();
+    }
   }
 }

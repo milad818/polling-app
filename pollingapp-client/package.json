@@ -6,7 +6,18 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "prepare": "husky",
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix",
+    "type-check": "tsc --noEmit -p tsconfig.app.json",
+    "format": "prettier --write \"src/**/*.{ts,html,css,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,css,json}\""
+  },
+  "lint-staged": {
+    "src/**/*.ts": ["eslint --fix", "prettier --write"],
+    "src/**/*.html": ["eslint --fix", "prettier --write"],
+    "src/**/*.{css,json}": ["prettier --write"]
   },
   "prettier": {
     "printWidth": 100,
@@ -35,11 +46,24 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@angular-eslint/builder": "^21.2.0",
+    "@angular-eslint/eslint-plugin": "^21.2.0",
+    "@angular-eslint/eslint-plugin-template": "^21.2.0",
+    "@angular-eslint/schematics": "^21.2.0",
+    "@angular-eslint/template-parser": "^21.2.0",
     "@angular/build": "^21.0.0",
     "@angular/cli": "^21.0.0",
     "@angular/compiler-cli": "^21.0.0",
+    "@eslint/js": "^9.39.3",
+    "angular-eslint": "^21.2.0",
+    "eslint": "^9.39.3",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
     "jsdom": "^27.1.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
     "typescript": "~5.9.2",
+    "typescript-eslint": "^8.56.0",
     "vitest": "^4.0.8"
   }
 }

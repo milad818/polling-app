@@ -1,5 +1,4 @@
 <div class="login-page">
-
   <!-- Infinite Tech Scroll Banner -->
   <div class="tech-scroll-banner">
     <div class="tech-scroll-track">
@@ -25,7 +24,6 @@
   <!-- Auth Card -->
   <div class="auth-wrapper">
     <div class="auth-card" [class.flipped]="isSignUp">
-
       <!-- Sign In Panel -->
       <div class="auth-panel sign-in-panel">
         <h2 class="panel-title">Welcome Back</h2>
@@ -55,9 +53,7 @@
               </div>
             }
             @if (siEmail.touched && siEmail.valid) {
-              <div class="field-validation valid">
-                Looks good!
-              </div>
+              <div class="field-validation valid">Looks good!</div>
             }
           </div>
 
@@ -75,9 +71,7 @@
               />
             </div>
             @if (siPassword.touched && siPassword.invalid) {
-              <div class="field-validation invalid">
-                Password is required.
-              </div>
+              <div class="field-validation invalid">Password is required.</div>
             }
           </div>
 
@@ -87,7 +81,8 @@
         </form>
 
         <div class="toggle-section">
-          <p>Don't have an account?
+          <p>
+            Don't have an account?
             <button type="button" class="toggle-btn" (click)="toggleMode()">Sign Up</button>
           </p>
         </div>
@@ -122,9 +117,7 @@
               </div>
             }
             @if (suEmail.touched && isSignUpEmailValid) {
-              <div class="field-validation valid">
-                Looks good!
-              </div>
+              <div class="field-validation valid">Looks good!</div>
             }
           </div>
 
@@ -174,30 +167,29 @@
               />
             </div>
             @if (suConfirm.touched && signUpConfirmPassword.length > 0 && !passwordsMatch) {
-              <div class="field-validation invalid">
-                Passwords do not match.
-              </div>
+              <div class="field-validation invalid">Passwords do not match.</div>
             }
             @if (suConfirm.touched && signUpConfirmPassword.length > 0 && passwordsMatch) {
-              <div class="field-validation valid">
-                Passwords match!
-              </div>
+              <div class="field-validation valid">Passwords match!</div>
             }
           </div>
 
-          <button type="submit" class="auth-btn" [disabled]="!isSignUpEmailValid || !isPasswordValid || !passwordsMatch || isLoading">
+          <button
+            type="submit"
+            class="auth-btn"
+            [disabled]="!isSignUpEmailValid || !isPasswordValid || !passwordsMatch || isLoading"
+          >
             {{ isLoading ? 'Creating account...' : 'Sign Up' }}
           </button>
         </form>
 
         <div class="toggle-section">
-          <p>Already have an account?
+          <p>
+            Already have an account?
             <button type="button" class="toggle-btn" (click)="toggleMode()">Sign In</button>
           </p>
         </div>
       </div>
-
     </div>
   </div>
-
 </div>

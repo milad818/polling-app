@@ -12,7 +12,8 @@
           placeholder="Type your question..."
           required
           minlength="5"
-          #question="ngModel" />
+          #question="ngModel"
+        />
         @if (question.invalid && question.touched) {
           <div class="error-message">
             @if (question.errors?.['required']) {
@@ -35,7 +36,8 @@
               placeholder="Type your option..."
               required
               minlength="1"
-              #optionInput="ngModel" />
+              #optionInput="ngModel"
+            />
             @if (optionInput.invalid && optionInput.touched) {
               <div class="error-message">
                 <span>Option is required.</span>
@@ -52,58 +54,83 @@
             class="remove-option-button"
             (click)="removeOption()"
             [disabled]="newPoll.options.length <= 2"
-            >Remove Option</button>
+          >
+            Remove Option
+          </button>
           <button
             type="button"
             class="add-option-button"
             (click)="addOption()"
             [disabled]="newPoll.options.length >= 4"
-            >Add Option</button>
+          >
+            Add Option
+          </button>
         </div>
         <div class="right-buttons">
-          <button
-            type="submit"
-            class="create-poll-button"
-            [disabled]="pollForm.invalid">Create Poll</button>
+          <button type="submit" class="create-poll-button" [disabled]="pollForm.invalid">
+            Create Poll
+          </button>
         </div>
       </div>
     </form>
   </div>
   <h4 class="app-instruction">Available polls:</h4>
-  @for(poll of polls; track poll.id){
-  <div class="polls-container">
-    <div class="poll-container">
-      @if (isOwnPoll(poll)) {
-        <button class="delete-poll-button" (click)="deletePoll(poll.id)" title="Delete poll">
-          ×
-        </button>
-      }
-      <div class="poll-question"> {{poll.question}} </div>
-      <div class="options-list">
-        @for (option of poll.options; track $index) {
-        <div class="option-bar-wrapper" (click)="doVote(poll.id, $index)">
-          <div class="option-bar-bg">
-            <div class="option-bar-fill" [style.width.%]="getPercentage(poll, $index)"></div>
-            <div class="option-bar-content">
-              <span class="option-bar-text">{{ option.optText }}</span>
-              <span class="option-bar-stats">{{ getPercentage(poll, $index) }}% ({{ option.voteCount }})</span>
-            </div>
-          </div>
-        </div>
+  @for (poll of polls; track poll.id) {
+    <div class="polls-container">
+      <div class="poll-container">
+        @if (isOwnPoll(poll)) {
+          <button class="delete-poll-button" (click)="deletePoll(poll.id)" title="Delete poll">
+            ×
+          </button>
         }
-      </div>
-      <div class="poll-footer">
-        <span class="poll-date">{{ formatDate(poll.createdAt) }}</span>
-        <span class="poll-creator">{{ poll.owner?.username || 'Unknown' }}</span>
+        <div class="poll-question">{{ poll.question }}</div>
+        <div class="options-list">
+          @for (option of poll.options; track $index) {
+            <!--
+          Each option bar is a voting button. To satisfy accessibility rules:
+            role="button"        – announces it as a button to screen readers
+            tabindex="0"         – makes it keyboard-focusable via Tab
+            (keydown.enter/space)  – keyboard equivalents for the click action
+        -->
+            <div
+              class="option-bar-wrapper"
+              role="button"
+              tabindex="0"
+              (click)="doVote(poll.id, $index)"
+              (keydown.enter)="doVote(poll.id, $index)"
+              (keydown.space)="$event.preventDefault(); doVote(poll.id, $index)"
+            >
+              <div class="option-bar-bg">
+                <div class="option-bar-fill" [style.width.%]="getPercentage(poll, $index)"></div>
+                <div class="option-bar-content">
+                  <span class="option-bar-text">{{ option.optText }}</span>
+                  <span class="option-bar-stats"
+                    >{{ getPercentage(poll, $index) }}% ({{ option.voteCount }})</span
+                  >
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="poll-footer">
+          <span class="poll-date">{{ formatDate(poll.createdAt) }}</span>
+          <span class="poll-creator">{{ poll.owner?.username || 'Unknown' }}</span>
+        </div>
       </div>
     </div>
-  </div>
   }
 </div>
 
 <!-- Delete Confirmation Modal -->
 @if (showDeleteConfirmation) {
+  <!--
+    Backdrop click closes the modal. stopPropagation on the inner content div
+    ensures bubbled clicks from inside the modal never trigger this handler.
+    Escape-key dismissal is handled by @HostListener in the component class.
+  -->
+  <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
   <div class="modal-overlay" (click)="cancelDelete()">
+    <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Confirm Deletion</h3>
