@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserProfile } from './user-profile.model';
+import { UserService, UserProfile, UpdateProfileRequest } from '../../services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -9,54 +9,104 @@ import { UserProfile } from './user-profile.model';
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
-export class ProfileComponent {
-  profile: UserProfile = {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    dateOfBirth: '1990-01-15',
-    phoneNumber: '+1 (555) 123-4567',
-    address: '123 Main St, Springfield, IL',
-    bio: 'Passionate about technology and creating meaningful polls.',
-    profilePicture: null
-  };
-
-  editProfile: UserProfile = { ...this.profile };
+export class ProfileComponent implements OnInit {
+  profile: UserProfile | null = null;
+  editUsername = '';
+  editBio = '';
+  editAvatarUrl = '';
   showEditModal = false;
+  isLoading = true;
+  editError = '';
+
+  constructor(
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.loadProfile();
+  }
+
+  loadProfile(): void {
+    this.isLoading = true;
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.profile = user;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading profile:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   openEditModal(): void {
-    this.editProfile = { ...this.profile };
+    if (this.profile) {
+      this.editUsername = this.profile.username;
+      this.editBio = this.profile.bio || '';
+      this.editAvatarUrl = this.profile.avatarUrl || '';
+    }
+    this.editError = '';
     this.showEditModal = true;
   }
 
   cancelEdit(): void {
     this.showEditModal = false;
+    this.editError = '';
+  }
+
+  onAvatarFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    // Limit to 500KB to keep things reasonable for DB storage
+    if (file.size > 512000) {
+      this.editError = 'Image must be smaller than 500 KB.';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.editAvatarUrl = reader.result as string;
+      this.editError = '';
+      this.cdr.detectChanges();
+    };
+    reader.readAsDataURL(file);
   }
 
   confirmEdit(): void {
-    this.profile = { ...this.editProfile };
-    this.showEditModal = false;
+    const data: UpdateProfileRequest = {
+      username: this.editUsername,
+      bio: this.editBio,
+      avatarUrl: this.editAvatarUrl || undefined
+    };
+
+    this.userService.updateProfile(data).subscribe({
+      next: (updatedUser) => {
+        this.profile = updatedUser;
+        // Also update username in localStorage for consistency
+        if (updatedUser.username) {
+          localStorage.setItem('username', updatedUser.username);
+        }
+        this.showEditModal = false;
+        this.editError = '';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error updating profile:', err);
+        this.editError = err.error?.message || err.error || 'Failed to save changes.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  onProfilePictureChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.editProfile.profilePicture = e.target?.result as string;
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  }
-
-  onProfilePictureUpload(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.profile.profilePicture = e.target?.result as string;
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
+  formatDate(dateStr?: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   }
 }

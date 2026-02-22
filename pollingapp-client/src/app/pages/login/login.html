@@ -31,41 +31,58 @@
         <h2 class="panel-title">Welcome Back</h2>
         <p class="panel-subtitle">Sign in to your account</p>
 
+        @if (errorMessage && !isSignUp) {
+          <div class="error-banner">{{ errorMessage }}</div>
+        }
+
         <form #signInForm="ngForm" (ngSubmit)="onSignIn()" class="auth-form">
-          <div class="input-group">
-            <span class="input-icon">&#9993;</span>
-            <input
-              type="email"
-              name="signInEmail"
-              [(ngModel)]="signInEmail"
-              placeholder="Email address"
-              required
-              email
-              #siEmail="ngModel"
-            />
+          <div class="form-field">
+            <div class="input-group">
+              <span class="input-icon">&#9993;</span>
+              <input
+                type="email"
+                name="signInEmail"
+                [(ngModel)]="signInEmail"
+                placeholder="Email address"
+                required
+                email
+                #siEmail="ngModel"
+              />
+            </div>
+            @if (siEmail.touched && siEmail.invalid) {
+              <div class="field-validation invalid">
+                Enter a valid email address (e.g. user&#64;example.com)
+              </div>
+            }
+            @if (siEmail.touched && siEmail.valid) {
+              <div class="field-validation valid">
+                Looks good!
+              </div>
+            }
           </div>
-          @if (siEmail.invalid && siEmail.touched) {
-            <span class="field-error">Please enter a valid email</span>
-          }
 
-          <div class="input-group">
-            <span class="input-icon">&#128274;</span>
-            <input
-              type="password"
-              name="signInPassword"
-              [(ngModel)]="signInPassword"
-              placeholder="Password"
-              required
-              minlength="4"
-              #siPassword="ngModel"
-            />
+          <div class="form-field">
+            <div class="input-group">
+              <span class="input-icon">&#128274;</span>
+              <input
+                type="password"
+                name="signInPassword"
+                [(ngModel)]="signInPassword"
+                placeholder="Password"
+                required
+                minlength="4"
+                #siPassword="ngModel"
+              />
+            </div>
+            @if (siPassword.touched && siPassword.invalid) {
+              <div class="field-validation invalid">
+                Password is required.
+              </div>
+            }
           </div>
-          @if (siPassword.invalid && siPassword.touched) {
-            <span class="field-error">Password is required (min 4 characters)</span>
-          }
 
-          <button type="submit" class="auth-btn" [disabled]="signInForm.invalid">
-            Sign In
+          <button type="submit" class="auth-btn" [disabled]="signInForm.invalid || isLoading">
+            {{ isLoading ? 'Signing in...' : 'Sign In' }}
           </button>
         </form>
 
@@ -81,72 +98,95 @@
         <h2 class="panel-title">Create Account</h2>
         <p class="panel-subtitle">Join the community</p>
 
+        @if (errorMessage && isSignUp) {
+          <div class="error-banner">{{ errorMessage }}</div>
+        }
+
         <form #signUpForm="ngForm" (ngSubmit)="onSignUp()" class="auth-form">
-          <div class="input-group">
-            <span class="input-icon">&#128100;</span>
-            <input
-              type="text"
-              name="signUpName"
-              [(ngModel)]="signUpName"
-              placeholder="Full name"
-              required
-              minlength="2"
-              #suName="ngModel"
-            />
+          <div class="form-field">
+            <div class="input-group">
+              <span class="input-icon">&#9993;</span>
+              <input
+                type="email"
+                name="signUpEmail"
+                [(ngModel)]="signUpEmail"
+                placeholder="Email address"
+                required
+                email
+                #suEmail="ngModel"
+              />
+            </div>
+            @if (suEmail.touched && !isSignUpEmailValid) {
+              <div class="field-validation invalid">
+                Enter a valid email address. Your username will be extracted from it.
+              </div>
+            }
+            @if (suEmail.touched && isSignUpEmailValid) {
+              <div class="field-validation valid">
+                Looks good!
+              </div>
+            }
           </div>
-          @if (suName.invalid && suName.touched) {
-            <span class="field-error">Name is required (min 2 characters)</span>
-          }
 
-          <div class="input-group">
-            <span class="input-icon">&#9993;</span>
-            <input
-              type="email"
-              name="signUpEmail"
-              [(ngModel)]="signUpEmail"
-              placeholder="Email address"
-              required
-              email
-              #suEmail="ngModel"
-            />
+          <div class="form-field">
+            <div class="input-group">
+              <span class="input-icon">&#128274;</span>
+              <input
+                type="password"
+                name="signUpPassword"
+                [(ngModel)]="signUpPassword"
+                placeholder="Password"
+                required
+                #suPassword="ngModel"
+              />
+            </div>
+            @if (suPassword.touched) {
+              <div class="password-rules">
+                <div class="pw-rule" [class.met]="hasMinLength">
+                  {{ hasMinLength ? '✓' : '✗' }} At least 10 characters
+                </div>
+                <div class="pw-rule" [class.met]="hasUpperCase">
+                  {{ hasUpperCase ? '✓' : '✗' }} 1 uppercase letter
+                </div>
+                <div class="pw-rule" [class.met]="hasLowerCase">
+                  {{ hasLowerCase ? '✓' : '✗' }} 1 lowercase letter
+                </div>
+                <div class="pw-rule" [class.met]="hasNumber">
+                  {{ hasNumber ? '✓' : '✗' }} 1 number
+                </div>
+                <div class="pw-rule" [class.met]="hasSpecialChar">
+                  {{ hasSpecialChar ? '✓' : '✗' }} 1 special character
+                </div>
+              </div>
+            }
           </div>
-          @if (suEmail.invalid && suEmail.touched) {
-            <span class="field-error">Please enter a valid email</span>
-          }
 
-          <div class="input-group">
-            <span class="input-icon">&#128274;</span>
-            <input
-              type="password"
-              name="signUpPassword"
-              [(ngModel)]="signUpPassword"
-              placeholder="Password"
-              required
-              minlength="6"
-              #suPassword="ngModel"
-            />
+          <div class="form-field">
+            <div class="input-group">
+              <span class="input-icon">&#128275;</span>
+              <input
+                type="password"
+                name="signUpConfirmPassword"
+                [(ngModel)]="signUpConfirmPassword"
+                placeholder="Confirm password"
+                required
+                #suConfirm="ngModel"
+              />
+            </div>
+            @if (suConfirm.touched && signUpConfirmPassword.length > 0 && !passwordsMatch) {
+              <div class="field-validation invalid">
+                Passwords do not match.
+              </div>
+            }
+            @if (suConfirm.touched && signUpConfirmPassword.length > 0 && passwordsMatch) {
+              <div class="field-validation valid">
+                Passwords match!
+              </div>
+            }
           </div>
-          @if (suPassword.invalid && suPassword.touched) {
-            <span class="field-error">Password must be at least 6 characters</span>
-          }
 
-          <div class="input-group">
-            <span class="input-icon">&#128275;</span>
-            <input
-              type="password"
-              name="signUpConfirmPassword"
-              [(ngModel)]="signUpConfirmPassword"
-              placeholder="Confirm password"
-              required
-              #suConfirm="ngModel"
-            />
-          </div>
-          @if (suConfirm.touched && signUpConfirmPassword !== signUpPassword) {
-            <span class="field-error">Passwords do not match</span>
-          }
-
-          <button type="submit" class="auth-btn" [disabled]="signUpForm.invalid || signUpPassword !== signUpConfirmPassword">
-            Sign Up
+          <button type="submit" class="auth-btn" [disabled]="!isSignUpEmailValid || !isPasswordValid || !passwordsMatch || isLoading">
+            {{ isLoading ? 'Creating account...' : 'Sign Up' }}
           </button>
         </form>
 
