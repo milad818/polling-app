@@ -1,0 +1,16 @@
+# ── Pre-commit hook ─────────────────────────────────────────────────────────
+#
+# Step 1 – lint-staged
+#   Runs ESLint (--fix) and Prettier (--write) ONLY on the files you have
+#   staged for this commit. Working on a subset is much faster than linting
+#   the whole repo and avoids noisy diffs from unrelated files.
+#
+# Step 2 – TypeScript type-check
+#   Runs `tsc --noEmit` against tsconfig.app.json.  ESLint only type-checks
+#   one file at a time; the full compiler sees cross-file relationships
+#   (missing imports, wrong generics, renamed interfaces, etc.) that
+#   per-file analysis would miss.  `--noEmit` skips writing output files —
+#   we just want the diagnostics.
+
+npx lint-staged
+npm run type-check

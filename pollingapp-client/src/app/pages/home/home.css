@@ -27,8 +27,13 @@
 }
 
 @keyframes headerGlow {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(30px, 30px) rotate(180deg); }
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(30px, 30px) rotate(180deg);
+  }
 }
 
 .header-content {
@@ -50,12 +55,17 @@
 }
 
 @keyframes titleFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .header-subtitle {
-  font-size: 1.60rem;
+  font-size: 1.6rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.95);
   margin: 1rem 0 0 0;

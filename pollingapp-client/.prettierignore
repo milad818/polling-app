@@ -1,0 +1,10 @@
+# Prettier should not touch generated or build output.
+# It also skips dependencies and Angular's internal cache.
+
+dist/
+.angular/
+node_modules/
+coverage/
+
+# Lockfile — Prettier can't reliably format these without corrupting them.
+package-lock.json

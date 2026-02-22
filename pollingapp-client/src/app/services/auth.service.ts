@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
@@ -14,21 +14,24 @@ export interface AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
-
   private baseUrl = 'http://localhost:8080/api/auth';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  // inject() is the modern Angular 14+ alternative to constructor parameter
+  // injection. It reads the same DI token but avoids boilerplate constructors
+  // and works in any injection context (not only constructors).
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
   login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, { email, password }).pipe(
-      tap(res => this.storeSession(res))
-    );
+    return this.http
+      .post<AuthResponse>(`${this.baseUrl}/login`, { email, password })
+      .pipe(tap((res) => this.storeSession(res)));
   }
 
   register(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/register`, { email, password }).pipe(
-      tap(res => this.storeSession(res))
-    );
+    return this.http
+      .post<AuthResponse>(`${this.baseUrl}/register`, { email, password })
+      .pipe(tap((res) => this.storeSession(res)));
   }
 
   logout(): void {

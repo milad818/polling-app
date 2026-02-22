@@ -26,10 +26,7 @@ describe('LoginComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [LoginComponent],
-      providers: [
-        { provide: AuthService, useValue: authServiceMock },
-        provideRouter([]),
-      ],
+      providers: [{ provide: AuthService, useValue: authServiceMock }, provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginComponent);
@@ -199,7 +196,7 @@ describe('LoginComponent', () => {
 
     it('sets errorMessage from backend error on login failure', () => {
       authServiceMock.login.mockReturnValue(
-        throwError(() => ({ error: { message: 'Invalid email or password!' } }))
+        throwError(() => ({ error: { message: 'Invalid email or password!' } })),
       );
       component.signInEmail = 'test@example.com';
       component.signInPassword = 'wrong';
@@ -262,7 +259,7 @@ describe('LoginComponent', () => {
 
     it('sets errorMessage from backend on registration failure', () => {
       authServiceMock.register.mockReturnValue(
-        throwError(() => ({ error: { message: 'Email is already registered!' } }))
+        throwError(() => ({ error: { message: 'Email is already registered!' } })),
       );
       component.signUpEmail = 'existing@example.com';
       component.signUpPassword = 'Password1!x';

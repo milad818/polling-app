@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -21,10 +21,9 @@ export interface UpdateProfileRequest {
   providedIn: 'root',
 })
 export class UserService {
-
   private baseUrl = 'http://localhost:8080/api/users';
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getCurrentUser(): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${this.baseUrl}/me`);

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { PollComponent } from '../../components/poll/poll';
 import { ProfileComponent } from '../../components/profile/profile';
 import { AuthService } from '../../services/auth.service';
@@ -7,10 +7,10 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-home',
   imports: [PollComponent, ProfileComponent],
   templateUrl: './home.html',
-  styleUrl: './home.css'
+  styleUrl: './home.css',
 })
 export class HomeComponent {
-  constructor(private authService: AuthService) {}
+  private authService = inject(AuthService);
 
   get welcomeMessage(): string {
     const name = this.authService.getUsername();

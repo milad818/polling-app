@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService, UserProfile, UpdateProfileRequest } from '../../services/user.service';
@@ -7,7 +7,7 @@ import { UserService, UserProfile, UpdateProfileRequest } from '../../services/u
   selector: 'app-profile',
   imports: [CommonModule, FormsModule],
   templateUrl: './profile.html',
-  styleUrl: './profile.css'
+  styleUrl: './profile.css',
 })
 export class ProfileComponent implements OnInit {
   profile: UserProfile | null = null;
@@ -18,10 +18,8 @@ export class ProfileComponent implements OnInit {
   isLoading = true;
   editError = '';
 
-  constructor(
-    private userService: UserService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.loadProfile();
@@ -39,7 +37,7 @@ export class ProfileComponent implements OnInit {
         console.error('Error loading profile:', err);
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -82,7 +80,7 @@ export class ProfileComponent implements OnInit {
     const data: UpdateProfileRequest = {
       username: this.editUsername,
       bio: this.editBio,
-      avatarUrl: this.editAvatarUrl || undefined
+      avatarUrl: this.editAvatarUrl || undefined,
     };
 
     this.userService.updateProfile(data).subscribe({
@@ -100,7 +98,7 @@ export class ProfileComponent implements OnInit {
         console.error('Error updating profile:', err);
         this.editError = err.error?.message || err.error || 'Failed to save changes.';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -108,5 +106,15 @@ export class ProfileComponent implements OnInit {
     if (!dateStr) return '';
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  // Close the edit modal when the user presses Escape.
+  // @HostListener on the document avoids the need to add role="button" /
+  // tabindex="0" to the backdrop div just to support keyboard dismissal.
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.showEditModal) {
+      this.cancelEdit();
+    }
   }
 }

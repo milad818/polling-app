@@ -111,6 +111,30 @@ describe('ProfileComponent', () => {
     });
   });
 
+  // ── onEscape() ────────────────────────────────────────────
+  // Regression: the previous implementation put (keydown.escape) on the modal
+  // backdrop div, which required role="button" + tabindex on that div. That
+  // made clicks inside the modal (incl. programmatic avatarInput.click()) bubble
+  // through the overlay handler and disrupt event flow. The fix moves keyboard
+  // dismissal into @HostListener on the component so the backdrop stays a plain
+  // non-interactive div.
+  describe('onEscape()', () => {
+    it('closes the edit modal when it is open', () => {
+      component.showEditModal = true;
+
+      component.onEscape();
+
+      expect(component.showEditModal).toBe(false);
+      expect(component.editError).toBe('');
+    });
+
+    it('does nothing when the edit modal is not open', () => {
+      component.showEditModal = false;
+      component.onEscape();
+      expect(component.showEditModal).toBe(false);
+    });
+  });
+
   // ── confirmEdit() ─────────────────────────────────────────
   describe('confirmEdit()', () => {
     const updatedProfile: UserProfile = {
@@ -133,7 +157,7 @@ describe('ProfileComponent', () => {
       userServiceMock.updateProfile.mockReturnValue(of(updatedProfile));
       component.confirmEdit();
       expect(userServiceMock.updateProfile).toHaveBeenCalledWith(
-        expect.objectContaining({ username: 'alice_updated', bio: 'New bio' })
+        expect.objectContaining({ username: 'alice_updated', bio: 'New bio' }),
       );
     });
 
@@ -157,16 +181,14 @@ describe('ProfileComponent', () => {
 
     it('sets editError on failure', () => {
       userServiceMock.updateProfile.mockReturnValue(
-        throwError(() => ({ error: { message: 'Username taken' } }))
+        throwError(() => ({ error: { message: 'Username taken' } })),
       );
       component.confirmEdit();
       expect(component.editError).toBe('Username taken');
     });
 
     it('falls back to a default error message when server provides no error body', () => {
-      userServiceMock.updateProfile.mockReturnValue(
-        throwError(() => ({}))
-      );
+      userServiceMock.updateProfile.mockReturnValue(throwError(() => ({})));
       component.confirmEdit();
       expect(component.editError).toBe('Failed to save changes.');
     });
