@@ -23,17 +23,25 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest request) {
-        // Check if email or username already exists
+        // Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email is already registered!");
         }
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username is already taken!");
+
+        // Extract username from email (part before @)
+        String username = request.getEmail().split("@")[0];
+
+        // If username already taken, append a number to make it unique
+        String baseUsername = username;
+        int suffix = 1;
+        while (userRepository.existsByUsername(username)) {
+            username = baseUsername + suffix;
+            suffix++;
         }
 
         // Create new user with hashed password
         User user = new User();
-        user.setUsername(request.getUsername());
+        user.setUsername(username);
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 

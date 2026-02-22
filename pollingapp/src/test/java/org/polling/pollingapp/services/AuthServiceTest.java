@@ -44,13 +44,12 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         registerRequest = new RegisterRequest();
-        registerRequest.setUsername("testuser");
         registerRequest.setEmail("test@example.com");
-        registerRequest.setPassword("password123");
+        registerRequest.setPassword("Password1!x");
 
         loginRequest = new LoginRequest();
         loginRequest.setEmail("test@example.com");
-        loginRequest.setPassword("password123");
+        loginRequest.setPassword("Password1!x");
     }
 
     // --- Register Tests ---
@@ -59,12 +58,12 @@ class AuthServiceTest {
     void register_shouldReturnAuthResponse_whenValidRequest() {
         // Arrange
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(userRepository.existsByUsername(anyString())).thenReturn(false);
+        when(userRepository.existsByUsername("test")).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
 
         User savedUser = new User();
         savedUser.setId(1L);
-        savedUser.setUsername("testuser");
+        savedUser.setUsername("test");
         savedUser.setEmail("test@example.com");
         savedUser.setPasswordHash("hashedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
@@ -77,11 +76,11 @@ class AuthServiceTest {
         // Assert
         assertThat(response.getToken()).isEqualTo("jwt-token");
         assertThat(response.getUserId()).isEqualTo(1L);
-        assertThat(response.getUsername()).isEqualTo("testuser");
+        assertThat(response.getUsername()).isEqualTo("test");
         assertThat(response.getEmail()).isEqualTo("test@example.com");
 
         // Verify password was encoded, not stored in plain text
-        verify(passwordEncoder).encode("password123");
+        verify(passwordEncoder).encode("Password1!x");
         verify(userRepository).save(any(User.class));
     }
 
@@ -97,15 +96,26 @@ class AuthServiceTest {
     }
 
     @Test
-    void register_shouldThrowException_whenUsernameAlreadyExists() {
+    void register_shouldAppendSuffix_whenUsernameAlreadyExists() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(userRepository.existsByUsername("testuser")).thenReturn(true);
+        // "test" is taken, "test1" is free
+        when(userRepository.existsByUsername("test")).thenReturn(true);
+        when(userRepository.existsByUsername("test1")).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
 
-        assertThatThrownBy(() -> authService.register(registerRequest))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Username is already taken!");
+        User savedUser = new User();
+        savedUser.setId(2L);
+        savedUser.setUsername("test1");
+        savedUser.setEmail("test@example.com");
+        savedUser.setPasswordHash("hashedPassword");
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-        verify(userRepository, never()).save(any(User.class));
+        when(jwtUtil.generateToken(2L, "test@example.com")).thenReturn("jwt-token-2");
+
+        AuthResponse response = authService.register(registerRequest);
+
+        assertThat(response.getUsername()).isEqualTo("test1");
+        verify(userRepository).save(any(User.class));
     }
 
     // --- Login Tests ---
@@ -119,7 +129,7 @@ class AuthServiceTest {
         user.setPasswordHash("hashedPassword");
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("password123", "hashedPassword")).thenReturn(true);
+        when(passwordEncoder.matches("Password1!x", "hashedPassword")).thenReturn(true);
         when(jwtUtil.generateToken(1L, "test@example.com")).thenReturn("jwt-token");
 
         AuthResponse response = authService.login(loginRequest);
@@ -146,7 +156,7 @@ class AuthServiceTest {
         user.setPasswordHash("hashedPassword");
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("password123", "hashedPassword")).thenReturn(false);
+        when(passwordEncoder.matches("Password1!x", "hashedPassword")).thenReturn(false);
 
         assertThatThrownBy(() -> authService.login(loginRequest))
                 .isInstanceOf(RuntimeException.class)
