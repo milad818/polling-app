@@ -109,7 +109,9 @@ public class PollService {
         pollRepository.save(poll);
     }
 
-    // Delete a poll only if the authenticated user is the owner
+    // Delete a poll only if the authenticated user is the owner.
+    // VoteRecord rows have a FK on poll_id, so they must be removed first.
+    @Transactional
     public void deletePoll(Long id, User currentUser) {
         Poll poll = getPollById(id)
                 .orElseThrow(() -> new RuntimeException("Poll not found!"));
@@ -118,6 +120,8 @@ public class PollService {
             throw new RuntimeException("You are not authorized to delete this poll!");
         }
 
+        // Delete all votes cast on this poll before deleting the poll itself
+        voteRecordRepository.deleteByPollId(id);
         pollRepository.deleteById(id);
     }
 }
