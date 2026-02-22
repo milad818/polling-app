@@ -3,8 +3,16 @@ export interface OptionVote {
   voteCount: number
 }
 
+export interface PollOwner {
+  id: number,
+  username: string,
+  email: string
+}
+
 export interface Poll {
   id: number,
   question: string,
   options: OptionVote[],
+  owner?: PollOwner,
+  createdAt?: string
 }

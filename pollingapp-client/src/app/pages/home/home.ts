@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { PollComponent } from '../../components/poll/poll';
 import { ProfileComponent } from '../../components/profile/profile';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -10,9 +10,14 @@ import { ProfileComponent } from '../../components/profile/profile';
   styleUrl: './home.css'
 })
 export class HomeComponent {
-  constructor(private router: Router) {}
+  constructor(private authService: AuthService) {}
+
+  get welcomeMessage(): string {
+    const name = this.authService.getUsername();
+    return name ? `Welcome, ${name}!` : 'Welcome!';
+  }
 
   logout(): void {
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }

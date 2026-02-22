@@ -5,6 +5,7 @@ import { OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-poll',
@@ -30,25 +31,55 @@ export class PollComponent implements OnInit {
   showDeleteConfirmation = false;
   pollToDelete: number | null = null;
 
+  // Track which option the current user voted for, per poll
+  userVotes: { [pollId: number]: number } = {};
+
   // Use constructor only for Dependency Injection
-  constructor(private pollService: PollService, private cdr: ChangeDetectorRef) {
-  }
+  constructor(
+    private pollService: PollService,
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
+  ) {}
 
   // Use ngOnInit for initialization logic
   ngOnInit(): void {
     this.loadPolls();
   }
 
-  // Logic to call services or initialize state goes below
+  get currentUserId(): number | null {
+    return this.authService.getUserId();
+  }
+
+  // Calculate total votes for a poll
+  getTotalVotes(poll: Poll): number {
+    return poll.options.reduce((sum, opt) => sum + opt.voteCount, 0);
+  }
+
+  // Calculate percentage for an option
+  getPercentage(poll: Poll, optionIndex: number): number {
+    const total = this.getTotalVotes(poll);
+    if (total === 0) return 0;
+    return Math.round((poll.options[optionIndex].voteCount / total) * 100);
+  }
+
+  // Format the creation date
+  formatDate(dateStr?: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  // Check if current user owns this poll
+  isOwnPoll(poll: Poll): boolean {
+    return !!poll.owner && poll.owner.id === this.currentUserId;
+  }
 
   // Fetch data from the database
   loadPolls() {
     this.pollService.getPolls().subscribe({
       next: (data) => {
-        // Trigger change detection; otherwise, the assignment this.polls = data happens outside a change detection cycle
-        this.polls = [...data]; // Create new array reference
-        this.cdr.detectChanges(); // Force detection
-        console.log(this.polls);
+        this.polls = [...data];
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error("Error fetching polls:", err)
@@ -63,7 +94,7 @@ export class PollComponent implements OnInit {
 
     this.pollService.createPoll(pollData as Poll).subscribe({
       next: (newPoll) => {
-        this.polls = [...this.polls, newPoll]; // Use the poll returned from server
+        this.polls = [...this.polls, newPoll];
         this.resetPoll();
         this.cdr.detectChanges();
       },
@@ -87,11 +118,8 @@ export class PollComponent implements OnInit {
   doVote(pollId: number, optionIndex: number) {
     this.pollService.doVote(pollId, optionIndex).subscribe({
       next: () => {
-        const poll = this.polls.find(p => p.id === pollId);
-        if (poll) {
-          poll.options[optionIndex].voteCount++;
-        }
-        this.cdr.detectChanges();
+        // Reload polls to get accurate counts from server
+        this.loadPolls();
       },
       error: (err) => {
         console.error("Error voting: ", err);

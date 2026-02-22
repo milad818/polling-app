@@ -13,11 +13,6 @@
           required
           minlength="5"
           #question="ngModel" />
-        <!--
-          Check if
-          Field has validation problems" (empty, too short, etc.)
-          User has clicked/tried this field
-        -->
         @if (question.invalid && question.touched) {
           <div class="error-message">
             @if (question.errors?.['required']) {
@@ -78,19 +73,28 @@
   @for(poll of polls; track poll.id){
   <div class="polls-container">
     <div class="poll-container">
-      <button class="delete-poll-button" (click)="deletePoll(poll.id)" title="Delete poll">
-        ×
-      </button>
+      @if (isOwnPoll(poll)) {
+        <button class="delete-poll-button" (click)="deletePoll(poll.id)" title="Delete poll">
+          ×
+        </button>
+      }
       <div class="poll-question"> {{poll.question}} </div>
-      <div class="options-container">
+      <div class="options-list">
         @for (option of poll.options; track $index) {
-        <div class="option-container">
-          <button class="option-button"
-                  (click)="doVote(poll.id, $index)">
-            {{option.optText}} ({{option.voteCount}} votes)
-          </button>
+        <div class="option-bar-wrapper" (click)="doVote(poll.id, $index)">
+          <div class="option-bar-bg">
+            <div class="option-bar-fill" [style.width.%]="getPercentage(poll, $index)"></div>
+            <div class="option-bar-content">
+              <span class="option-bar-text">{{ option.optText }}</span>
+              <span class="option-bar-stats">{{ getPercentage(poll, $index) }}% ({{ option.voteCount }})</span>
+            </div>
+          </div>
         </div>
         }
+      </div>
+      <div class="poll-footer">
+        <span class="poll-date">{{ formatDate(poll.createdAt) }}</span>
+        <span class="poll-creator">{{ poll.owner?.username || 'Unknown' }}</span>
       </div>
     </div>
   </div>

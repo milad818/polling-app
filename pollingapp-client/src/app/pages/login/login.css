@@ -132,7 +132,7 @@
 }
 
 .login-title {
-  font-size: 3.2rem;
+  font-size: 5.2rem;
   font-weight: 800;
   background: linear-gradient(135deg, #c084fc, #38bdf8, #c084fc);
   background-size: 200% 200%;
@@ -461,4 +461,59 @@
     padding: 24px 18px;
     border-radius: 16px;
   }
+}
+
+/* ===== ERROR BANNER ===== */
+.error-banner {
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  color: #f87171;
+  font-size: 0.88rem;
+  text-align: center;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== FORM FIELD ===== */
+.form-field {
+  margin-top: 8px;
+}
+
+/* ===== FIELD VALIDATION (below input) ===== */
+.field-validation {
+  font-size: 0.78rem;
+  padding: 4px 16px 0;
+  animation: slideDown 0.2s ease-out;
+}
+
+.field-validation.valid {
+  color: #4ade80;
+}
+
+.field-validation.invalid {
+  color: #f87171;
+}
+
+/* ===== PASSWORD RULES (below input) ===== */
+.password-rules {
+  padding: 6px 16px 0;
+  animation: slideDown 0.2s ease-out;
+}
+
+.pw-rule {
+  padding: 1px 0;
+  font-size: 0.78rem;
+  color: #f87171;
+  transition: color 0.2s ease;
+}
+
+.pw-rule.met {
+  color: #4ade80;
 }
