@@ -1,163 +1,151 @@
 # 📊 Polling App
 
-> ⚠️ **Note:** This project is currently under active development and is not yet complete. Features are being added incrementally.
-
-A modern, full-stack polling application that allows users to create, manage, and vote on polls with real-time results. Built with Spring Boot backend and Angular frontend, featuring user authentication, profile management, and a sleek, responsive UI.
+A full-stack polling application where users can register, create and manage polls, vote, and maintain a personal profile. Built with a Spring Boot REST API and an Angular SPA.
 
 ## 🎬 Demo
 
-![Login Demo](pollingapp-client/public/login-demo.gif)
+![Login Demo](pollingapp-client/public/polling-app-demo-2.gif)
 
-##  Tech Stack
+## Tech Stack
 
 ### Backend
-- **Spring Boot 4.0.2** - Java backend framework
-- **Spring Data JPA** - ORM and database abstraction
-- **Spring Web MVC** - RESTful API development
-- **MySQL** - Relational database
-- **Lombok** - Reduce boilerplate code
-- **Java 21** - Programming language
+| | |
+|---|---|
+| **Java 21** | Programming language |
+| **Spring Boot 4.0.2** | Application framework |
+| **Spring Security** | Authentication & authorisation |
+| **Spring Data JPA / Hibernate** | ORM and data access |
+| **MySQL 8** | Relational database |
+| **JWT (jjwt)** | Stateless token-based auth |
+| **Lombok** | Boilerplate reduction |
+| **JUnit 5 / Mockito** | Unit testing (40 tests) |
 
 ### Frontend
-- **Angular 21** - Modern TypeScript-based framework
-- **TypeScript 5.9** - Type-safe JavaScript
-- **RxJS 7.8** - Reactive programming
-- **Angular Router** - SPA navigation
-- **Angular Forms** - Template-driven forms with validation
-- **Custom CSS** - No framework dependencies, fully custom styled components
-- **Font Awesome 7.2** - Icon library
+| | |
+|---|---|
+| **Angular 21** | SPA framework (standalone components, `@for` control flow) |
+| **TypeScript 5.9** | Type-safe language |
+| **RxJS 7.8** | Reactive HTTP and state |
+| **Angular Forms** | Template-driven forms with validation |
+| **Vitest 4** | Unit test runner (124 tests) |
+| **ESLint v9** | Linting (flat config, `@angular-eslint`, `typescript-eslint`) |
+| **Prettier 3** | Code formatting |
+| **Husky + lint-staged** | Pre-commit quality gates |
+| **Custom CSS** | Fully hand-crafted responsive styles |
 
-## 📁 Repository Structure
+## Project Structure
 
 ```
 polling-app/
-├── pollingapp/                 # Backend (Spring Boot)
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   │   └── org/polling/pollingapp/
-│   │   │   │       ├── PollingappApplication.java    # Main entry point
-│   │   │   │       ├── controller/
-│   │   │   │       │   └── PollController.java        # REST API endpoints
-│   │   │   │       ├── model/
-│   │   │   │       │   ├── Poll.java                  # Poll entity
-│   │   │   │       │   └── OptionVote.java            # Vote option entity
-│   │   │   │       ├── repositories/
-│   │   │   │       │   └── PollRepository.java        # JPA repository
-│   │   │   │       ├── services/
-│   │   │   │       │   └── PollService.java           # Business logic
-│   │   │   │       └── request/
-│   │   │   │           └── Vote.java                  # Vote request DTO
-│   │   │   └── resources/
-│   │   │       └── application.properties             # Database config
-│   │   └── test/
-│   ├── pom.xml                                        # Maven dependencies
-│   └── target/                                        # Compiled classes
+├── pollingapp/                         # Spring Boot backend
+│   └── src/
+│       ├── main/java/.../
+│       │   ├── controller/             # REST controllers (Auth, Poll, User)
+│       │   ├── model/                  # JPA entities (User, Poll, VoteRecord)
+│       │   ├── repositories/           # Spring Data repositories
+│       │   ├── services/               # Business logic
+│       │   ├── security/               # JWT filter, SecurityConfig
+│       │   └── request/                # Request/response DTOs
+│       └── test/                       # Unit tests
 │
-├── pollingapp-client/          # Frontend (Angular)
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── pages/
-│   │   │   │   ├── home/                              # Home page component
-│   │   │   │   └── login/                             # Login page component
-│   │   │   ├── poll/                                  # Poll CRUD component
-│   │   │   ├── profile/                               # User profile component
-│   │   │   ├── poll.ts                                # HTTP service for polls
-│   │   │   ├── poll.models.ts                         # TypeScript interfaces
-│   │   │   ├── app.routes.ts                          # Route definitions
-│   │   │   ├── app.config.ts                          # App configuration
-│   │   │   └── app.ts                                 # Root component
-│   │   ├── index.html                                 # Entry HTML
-│   │   ├── main.ts                                    # Angular bootstrap
-│   │   └── styles.css                                 # Global styles
-│   ├── public/
-│   │   ├── login-demo.gif                             # Login page demo
-│   │   └── favicon.ico
-│   ├── package.json                                   # npm dependencies
-│   ├── angular.json                                   # Angular CLI config
-│   └── tsconfig.json                                  # TypeScript config
-│
-├── LICENSE                                            # Project license
-└── README.md                                          # This file
+└── pollingapp-client/                  # Angular frontend
+    ├── src/app/
+    │   ├── pages/
+    │   │   ├── login/                  # Sign-in / sign-up page
+    │   │   └── home/                   # Authenticated home page
+    │   ├── components/
+    │   │   ├── poll/                   # Poll list, create, vote, delete
+    │   │   └── profile/                # Profile view and edit modal
+    │   ├── services/                   # AuthService, PollService, UserService
+    │   ├── guards/                     # AuthGuard (route protection)
+    │   └── models/                     # TypeScript interfaces
+    ├── eslint.config.mjs               # ESLint flat config
+    ├── .husky/pre-commit               # Pre-commit hook
+    └── .prettierignore
 ```
 
-##  Current Features
+## ✅ Implemented
 
-### ✅ Implemented
-- **Login & Authentication UI** - Animated login page with sign-in/sign-up toggle
-  - Fancy animated title and tech scroll banner
-  - 3D card flip transition between sign-in and sign-up forms
-  - Form validation with error messages
-- **Home Page** - Two-column layout (polls + profile)
-- **Poll Management**
-  - Create polls with 2-4 options
-  - Vote on existing polls
-  - Delete polls with confirmation modal
-  - Real-time vote count display
-  - Animated, responsive UI with gradient header
-- **User Profile Component**
-  - Display user information (name, email, DOB, phone, address, bio)
-  - Upload profile picture
-  - Edit profile with modal dialog
-- **Routing** - Multi-page navigation (login → home)
-- **Responsive Design** - Works on desktop, tablet, and mobile
+### Authentication & Security
+- JWT-based stateless authentication (register / login)
+- Password hashing with BCrypt
+- `AuthGuard` protecting all routes behind login
+- HTTP interceptor attaching `Bearer` token to every request
+- Strong password validation (length, upper/lower, number, special char)
+- Immediate inline error feedback (duplicate email, wrong credentials)
 
-### 🚧 In Progress / Planned
-- Backend authentication & authorization (Spring Security)
-- User registration and login API integration
-- Session management and JWT tokens
-- Profile data persistence
-- Poll ownership and permissions
-- Advanced poll features (time limits, multiple choice, etc.)
-- Dashboard with statistics
-- Real-time updates (WebSocket)
-- Deployment configuration
+### Poll Management
+- Create polls with 2–4 custom options
+- View all polls with live vote percentages and counts
+- Vote on any poll; change vote (previous option decremented automatically)
+- Delete own polls — vote records removed atomically before the poll
+- Confirmation modal with keyboard (Escape) and backdrop-click dismissal
+- Poll ownership: only the creator sees and can use the delete button
 
-##  Development Setup
+### User Profiles
+- View profile (username, email, bio, avatar, member-since date)
+- Edit username and bio via modal
+- Upload and preview avatar image
+- Instant feedback on save success / failure
+
+### Developer Tooling
+- **ESLint** — `@angular-eslint`, `typescript-eslint` recommended + stylistic, Prettier integration
+- **Prettier** — consistent formatting enforced on save and commit
+- **Husky pre-commit hook** — runs `lint-staged` (lint + format changed files) then `tsc --noEmit`
+- **124 frontend tests** across 8 spec files (services, guards, interceptor, components)
+- **40 backend tests** (JWT, auth service, poll service ownership + vote tracking, user service)
+
+## 🚧 In Progress / Planned
+
+- Advanced poll options (deadlines, multiple-choice, anonymous voting)
+- Dashboard with personal poll statistics
+- Real-time vote updates via WebSocket
+- Pagination / infinite scroll for large poll lists
+- Deployment configuration (Docker, CI/CD)
+
+## Development Setup
 
 ### Prerequisites
-- Java 17 or higher
-- Node.js 18+ and npm
-- MySQL 8.0+
-- Maven 3.6+
+- Java 21
+- Node.js 20+ and npm
+- MySQL 8
+- Maven 3.9+
 
 ### Backend Setup
 ```bash
 cd pollingapp
-mvn clean install
-mvn spring-boot:run
+./mvnw spring-boot:run
+# API available at http://localhost:8080
 ```
-Backend runs on `http://localhost:8080`
 
-### Frontend Setup
+Run backend tests:
+
+```bash
+./mvnw test
+```
+
+### Frontend
+
 ```bash
 cd pollingapp-client
 npm install
-npm start
-```
-Frontend runs on `http://localhost:4200`
-
-### Database Configuration
-Update `pollingapp/src/main/resources/application.properties`:
-```properties
-spring.datasource.username=your_username
-spring.datasource.password=your_password
+ng serve
+# App available at http://localhost:4200
 ```
 
-##  Current Status
+Run frontend tests:
 
-This project is **actively being developed** and is not production-ready. The current implementation focuses on:
-- Frontend UI/UX design and layout
-- Basic CRUD operations for polls
-- Component architecture and routing
-- Mock authentication (frontend only)
+```bash
+ng test --watch=false
+```
 
-**Next steps:** Backend authentication integration, user management, and data persistence for profiles.
+Lint and type-check:
 
-##  License
+```bash
+npm run lint
+npm run type-check
+```
 
-MIT License (see LICENSE file)
+## License
 
----
-
-💡 **Developer Note:** This is a learning/portfolio project demonstrating full-stack development skills with Spring Boot and Angular.
+MIT — see [LICENSE](LICENSE)
