@@ -4,7 +4,7 @@ A full-stack polling application where users can register, create and manage pol
 
 ## 🎬 Demo
 
-![Login Demo](pollingapp-client/public/polling-app-demo-2.gif)
+![Login Demo](pollingapp-client/public/login-demo.gif)
 
 ## Tech Stack
 
