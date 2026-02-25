@@ -28,6 +28,7 @@
     </scm>
     <properties>
         <java.version>17</java.version>
+        <spotless.version>2.44.0</spotless.version>
     </properties>
     <dependencies>
         <dependency>
@@ -107,6 +108,66 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <!--
+                Spotless: auto-formatter for Java (equivalent to Prettier).
+                - spotless:apply  → auto-fix all formatting
+                - spotless:check  → fail if any file is not formatted (runs in verify)
+            -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.version}</version>
+                <configuration>
+                    <java>
+                        <!--
+                            Eclipse JDT formatter: no JDK internal-API
+                            dependencies, works on any JDK version (tested on
+                            JDK 17 through 25). Uses Eclipse 4.x default rules
+                            plus the tweaks below.
+                        -->
+                        <eclipse>
+                            <version>4.33</version>
+                        </eclipse>
+                        <!-- Remove unused imports -->
+                        <removeUnusedImports/>
+                        <!-- Trim trailing whitespace -->
+                        <trimTrailingWhitespace/>
+                        <!-- Ensure every file ends with a newline -->
+                        <endWithNewline/>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>spotless-check</id>
+                        <phase>verify</phase>
+                        <goals><goal>check</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                Checkstyle: static analysis / style rules (equivalent to ESLint).
+                Rules are defined in checkstyle.xml at the project root.
+                - checkstyle:check → fail on violations (runs in verify)
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkstyle-check</id>
+                        <phase>verify</phase>
+                        <goals><goal>check</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

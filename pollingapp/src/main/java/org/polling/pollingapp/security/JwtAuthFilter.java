@@ -20,41 +20,42 @@ import java.util.Optional;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+	private final JwtUtil jwtUtil;
+	private final UserRepository userRepository;
 
-    public JwtAuthFilter(JwtUtil jwtUtil, UserRepository userRepository) {
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-    }
+	public JwtAuthFilter(JwtUtil jwtUtil, UserRepository userRepository) {
+		this.jwtUtil = jwtUtil;
+		this.userRepository = userRepository;
+	}
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+		String authHeader = request.getHeader("Authorization");
 
-        // If no Bearer token is present, continue without authentication (allows anonymous access)
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+		// If no Bearer token is present, continue without authentication (allows
+		// anonymous access)
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
+		String token = authHeader.substring(7); // Remove "Bearer " prefix
 
-        if (jwtUtil.validateToken(token)) {
-            Long userId = jwtUtil.getUserIdFromToken(token);
-            Optional<User> userOpt = userRepository.findById(userId);
+		if (jwtUtil.validateToken(token)) {
+			Long userId = jwtUtil.getUserIdFromToken(token);
+			Optional<User> userOpt = userRepository.findById(userId);
 
-            if (userOpt.isPresent()) {
-                User user = userOpt.get();
-                // Create authentication token and set it in the security context
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
-        }
+			if (userOpt.isPresent()) {
+				User user = userOpt.get();
+				// Create authentication token and set it in the security context
+				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null,
+						Collections.emptyList());
+				SecurityContextHolder.getContext().setAuthentication(authToken);
+			}
+		}
 
-        filterChain.doFilter(request, response);
-    }
+		filterChain.doFilter(request, response);
+	}
 }

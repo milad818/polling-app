@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 public class UpdateProfileRequest {
 
-    @Size(min = 3, max = 50)
-    private String username;
+	@Size(min = 3, max = 50)
+	private String username;
 
-    @Size(max = 255)
-    private String bio;
+	@Size(max = 255)
+	private String bio;
 
-    private String avatarUrl;
+	private String avatarUrl;
 }
