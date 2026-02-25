@@ -12,7 +12,8 @@
     "lint:fix": "ng lint --fix",
     "type-check": "tsc --noEmit -p tsconfig.app.json",
     "format": "prettier --write \"src/**/*.{ts,html,css,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,html,css,json}\""
+    "format:check": "prettier --check \"src/**/*.{ts,html,css,json}\"",
+    "validate": "npm run lint && npm run type-check && npm run format:check && ng test --watch=false"
   },
   "lint-staged": {
     "src/**/*.ts": ["eslint --fix", "prettier --write"],

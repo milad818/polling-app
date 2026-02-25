@@ -20,117 +20,115 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+	@Mock
+	private UserRepository userRepository;
 
-    @InjectMocks
-    private UserService userService;
+	@InjectMocks
+	private UserService userService;
 
-    private User user;
+	private User user;
 
-    @BeforeEach
-    void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
-        user.setBio("Old bio");
-        user.setAvatarUrl("https://example.com/old.png");
-    }
+	@BeforeEach
+	void setUp() {
+		user = new User();
+		user.setId(1L);
+		user.setUsername("testuser");
+		user.setEmail("test@example.com");
+		user.setBio("Old bio");
+		user.setAvatarUrl("https://example.com/old.png");
+	}
 
-    @Test
-    void getUserById_existingUser_returnsUser() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+	@Test
+	void getUserById_existingUser_returnsUser() {
+		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        User result = userService.getUserById(1L);
+		User result = userService.getUserById(1L);
 
-        assertThat(result.getUsername()).isEqualTo("testuser");
-    }
+		assertThat(result.getUsername()).isEqualTo("testuser");
+	}
 
-    @Test
-    void getUserById_notFound_throwsException() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+	@Test
+	void getUserById_notFound_throwsException() {
+		when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.getUserById(99L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("User not found");
-    }
+		assertThatThrownBy(() -> userService.getUserById(99L)).isInstanceOf(RuntimeException.class)
+				.hasMessageContaining("User not found");
+	}
 
-    @Test
-    void updateProfile_updatesAllFields() {
-        UpdateProfileRequest request = new UpdateProfileRequest();
-        request.setUsername("newname");
-        request.setBio("New bio");
-        request.setAvatarUrl("https://example.com/new.png");
+	@Test
+	void updateProfile_updatesAllFields() {
+		UpdateProfileRequest request = new UpdateProfileRequest();
+		request.setUsername("newname");
+		request.setBio("New bio");
+		request.setAvatarUrl("https://example.com/new.png");
 
-        when(userRepository.existsByUsername("newname")).thenReturn(false);
-        when(userRepository.save(any(User.class))).thenReturn(user);
+		when(userRepository.existsByUsername("newname")).thenReturn(false);
+		when(userRepository.save(any(User.class))).thenReturn(user);
 
-        User result = userService.updateProfile(user, request);
+		User result = userService.updateProfile(user, request);
 
-        assertThat(user.getUsername()).isEqualTo("newname");
-        assertThat(user.getBio()).isEqualTo("New bio");
-        assertThat(user.getAvatarUrl()).isEqualTo("https://example.com/new.png");
-        verify(userRepository).save(user);
-    }
+		assertThat(user.getUsername()).isEqualTo("newname");
+		assertThat(user.getBio()).isEqualTo("New bio");
+		assertThat(user.getAvatarUrl()).isEqualTo("https://example.com/new.png");
+		verify(userRepository).save(user);
+	}
 
-    @Test
-    void updateProfile_sameUsername_doesNotThrow() {
-        UpdateProfileRequest request = new UpdateProfileRequest();
-        request.setUsername("testuser"); // same as current
-        request.setBio("Updated bio");
+	@Test
+	void updateProfile_sameUsername_doesNotThrow() {
+		UpdateProfileRequest request = new UpdateProfileRequest();
+		request.setUsername("testuser"); // same as current
+		request.setBio("Updated bio");
 
-        when(userRepository.existsByUsername("testuser")).thenReturn(true);
-        when(userRepository.save(any(User.class))).thenReturn(user);
+		when(userRepository.existsByUsername("testuser")).thenReturn(true);
+		when(userRepository.save(any(User.class))).thenReturn(user);
 
-        userService.updateProfile(user, request);
+		userService.updateProfile(user, request);
 
-        assertThat(user.getUsername()).isEqualTo("testuser");
-        assertThat(user.getBio()).isEqualTo("Updated bio");
-        verify(userRepository).save(user);
-    }
+		assertThat(user.getUsername()).isEqualTo("testuser");
+		assertThat(user.getBio()).isEqualTo("Updated bio");
+		verify(userRepository).save(user);
+	}
 
-    @Test
-    void updateProfile_duplicateUsername_throwsException() {
-        UpdateProfileRequest request = new UpdateProfileRequest();
-        request.setUsername("taken");
+	@Test
+	void updateProfile_duplicateUsername_throwsException() {
+		UpdateProfileRequest request = new UpdateProfileRequest();
+		request.setUsername("taken");
 
-        when(userRepository.existsByUsername("taken")).thenReturn(true);
+		when(userRepository.existsByUsername("taken")).thenReturn(true);
 
-        assertThatThrownBy(() -> userService.updateProfile(user, request))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Username is already taken");
+		assertThatThrownBy(() -> userService.updateProfile(user, request)).isInstanceOf(RuntimeException.class)
+				.hasMessageContaining("Username is already taken");
 
-        verify(userRepository, never()).save(any());
-    }
+		verify(userRepository, never()).save(any());
+	}
 
-    @Test
-    void updateProfile_nullFields_keepsExistingValues() {
-        UpdateProfileRequest request = new UpdateProfileRequest();
-        // All fields null — nothing should change
+	@Test
+	void updateProfile_nullFields_keepsExistingValues() {
+		UpdateProfileRequest request = new UpdateProfileRequest();
+		// All fields null — nothing should change
 
-        when(userRepository.save(any(User.class))).thenReturn(user);
+		when(userRepository.save(any(User.class))).thenReturn(user);
 
-        userService.updateProfile(user, request);
+		userService.updateProfile(user, request);
 
-        assertThat(user.getUsername()).isEqualTo("testuser");
-        assertThat(user.getBio()).isEqualTo("Old bio");
-        assertThat(user.getAvatarUrl()).isEqualTo("https://example.com/old.png");
-        verify(userRepository).save(user);
-    }
+		assertThat(user.getUsername()).isEqualTo("testuser");
+		assertThat(user.getBio()).isEqualTo("Old bio");
+		assertThat(user.getAvatarUrl()).isEqualTo("https://example.com/old.png");
+		verify(userRepository).save(user);
+	}
 
-    @Test
-    void updateProfile_blankUsername_keepsExisting() {
-        UpdateProfileRequest request = new UpdateProfileRequest();
-        request.setUsername("   "); // blank
-        request.setBio("New bio");
+	@Test
+	void updateProfile_blankUsername_keepsExisting() {
+		UpdateProfileRequest request = new UpdateProfileRequest();
+		request.setUsername("   "); // blank
+		request.setBio("New bio");
 
-        when(userRepository.save(any(User.class))).thenReturn(user);
+		when(userRepository.save(any(User.class))).thenReturn(user);
 
-        userService.updateProfile(user, request);
+		userService.updateProfile(user, request);
 
-        assertThat(user.getUsername()).isEqualTo("testuser"); // unchanged
-        assertThat(user.getBio()).isEqualTo("New bio");
-        verify(userRepository).save(user);
-    }
+		assertThat(user.getUsername()).isEqualTo("testuser"); // unchanged
+		assertThat(user.getBio()).isEqualTo("New bio");
+		verify(userRepository).save(user);
+	}
 }

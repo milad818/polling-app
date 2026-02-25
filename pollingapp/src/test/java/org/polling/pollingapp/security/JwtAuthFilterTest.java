@@ -25,98 +25,98 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class JwtAuthFilterTest {
 
-    @Mock
-    private JwtUtil jwtUtil;
+	@Mock
+	private JwtUtil jwtUtil;
 
-    @Mock
-    private UserRepository userRepository;
+	@Mock
+	private UserRepository userRepository;
 
-    @Mock
-    private FilterChain filterChain;
+	@Mock
+	private FilterChain filterChain;
 
-    @InjectMocks
-    private JwtAuthFilter jwtAuthFilter;
+	@InjectMocks
+	private JwtAuthFilter jwtAuthFilter;
 
-    private MockHttpServletRequest request;
-    private MockHttpServletResponse response;
+	private MockHttpServletRequest request;
+	private MockHttpServletResponse response;
 
-    @BeforeEach
-    void setUp() {
-        request = new MockHttpServletRequest();
-        response = new MockHttpServletResponse();
-        SecurityContextHolder.clearContext();
-    }
+	@BeforeEach
+	void setUp() {
+		request = new MockHttpServletRequest();
+		response = new MockHttpServletResponse();
+		SecurityContextHolder.clearContext();
+	}
 
-    @AfterEach
-    void tearDown() {
-        SecurityContextHolder.clearContext();
-    }
+	@AfterEach
+	void tearDown() {
+		SecurityContextHolder.clearContext();
+	}
 
-    @Test
-    void shouldContinueFilterChain_whenNoAuthorizationHeader() throws ServletException, IOException {
-        // No Authorization header set
+	@Test
+	void shouldContinueFilterChain_whenNoAuthorizationHeader() throws ServletException, IOException {
+		// No Authorization header set
 
-        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+		jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain).doFilter(request, response);
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-    }
+		verify(filterChain).doFilter(request, response);
+		assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+	}
 
-    @Test
-    void shouldContinueFilterChain_whenAuthorizationHeaderIsNotBearer() throws ServletException, IOException {
-        request.addHeader("Authorization", "Basic some-credentials");
+	@Test
+	void shouldContinueFilterChain_whenAuthorizationHeaderIsNotBearer() throws ServletException, IOException {
+		request.addHeader("Authorization", "Basic some-credentials");
 
-        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+		jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain).doFilter(request, response);
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-    }
+		verify(filterChain).doFilter(request, response);
+		assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+	}
 
-    @Test
-    void shouldSetAuthentication_whenTokenIsValid() throws ServletException, IOException {
-        String token = "valid-jwt-token";
-        request.addHeader("Authorization", "Bearer " + token);
+	@Test
+	void shouldSetAuthentication_whenTokenIsValid() throws ServletException, IOException {
+		String token = "valid-jwt-token";
+		request.addHeader("Authorization", "Bearer " + token);
 
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
+		User user = new User();
+		user.setId(1L);
+		user.setUsername("testuser");
+		user.setEmail("test@example.com");
 
-        when(jwtUtil.validateToken(token)).thenReturn(true);
-        when(jwtUtil.getUserIdFromToken(token)).thenReturn(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+		when(jwtUtil.validateToken(token)).thenReturn(true);
+		when(jwtUtil.getUserIdFromToken(token)).thenReturn(1L);
+		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+		jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain).doFilter(request, response);
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
-        assertThat(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).isEqualTo(user);
-    }
+		verify(filterChain).doFilter(request, response);
+		assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
+		assertThat(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).isEqualTo(user);
+	}
 
-    @Test
-    void shouldNotSetAuthentication_whenTokenIsInvalid() throws ServletException, IOException {
-        request.addHeader("Authorization", "Bearer invalid-token");
+	@Test
+	void shouldNotSetAuthentication_whenTokenIsInvalid() throws ServletException, IOException {
+		request.addHeader("Authorization", "Bearer invalid-token");
 
-        when(jwtUtil.validateToken("invalid-token")).thenReturn(false);
+		when(jwtUtil.validateToken("invalid-token")).thenReturn(false);
 
-        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+		jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain).doFilter(request, response);
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-    }
+		verify(filterChain).doFilter(request, response);
+		assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+	}
 
-    @Test
-    void shouldNotSetAuthentication_whenUserNotFoundInDb() throws ServletException, IOException {
-        String token = "valid-but-user-deleted";
-        request.addHeader("Authorization", "Bearer " + token);
+	@Test
+	void shouldNotSetAuthentication_whenUserNotFoundInDb() throws ServletException, IOException {
+		String token = "valid-but-user-deleted";
+		request.addHeader("Authorization", "Bearer " + token);
 
-        when(jwtUtil.validateToken(token)).thenReturn(true);
-        when(jwtUtil.getUserIdFromToken(token)).thenReturn(999L);
-        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+		when(jwtUtil.validateToken(token)).thenReturn(true);
+		when(jwtUtil.getUserIdFromToken(token)).thenReturn(999L);
+		when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+		jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain).doFilter(request, response);
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-    }
+		verify(filterChain).doFilter(request, response);
+		assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+	}
 }

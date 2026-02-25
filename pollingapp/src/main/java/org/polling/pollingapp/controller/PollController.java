@@ -6,10 +6,17 @@ import org.polling.pollingapp.request.Vote;
 import org.polling.pollingapp.services.PollService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
 
 // The Controller/API Layer is implemented here
 // It tells Spring to take the JSON or XML data from the body of an HTTP request and "deserialize" it into a Java object.
@@ -17,60 +24,59 @@ import java.util.List;
 @RequestMapping("/api/polls")
 @CrossOrigin(origins = "http://localhost:4200/")
 public class PollController {
-    private final PollService pollService;
+	private final PollService pollService;
 
-    public PollController(PollService pollService) {
-        this.pollService = pollService;
-    }
+	public PollController(PollService pollService) {
+		this.pollService = pollService;
+	}
 
-    // Create a new poll - requires authentication, sets the owner automatically
-    @PostMapping
-    public Poll createPoll(@RequestBody Poll poll, @AuthenticationPrincipal User currentUser) {
-        return pollService.savePoll(poll, currentUser);
-    }
+	// Create a new poll - requires authentication, sets the owner automatically
+	@PostMapping
+	public Poll createPoll(@RequestBody Poll poll, @AuthenticationPrincipal User currentUser) {
+		return pollService.savePoll(poll, currentUser);
+	}
 
-    // If you put a URL in both, they concatenate (join together)
-    // If you leave @GetMapping empty, it defaults to the URL defined in the @RequestMapping
-    @GetMapping("/all")
-    public List<Poll> getPolls() {
-        return pollService.getAllPolls();
-    }
+	// If you put a URL in both, they concatenate (join together)
+	// If you leave @GetMapping empty, it defaults to the URL defined in the
+	// @RequestMapping
+	@GetMapping("/all")
+	public List<Poll> getPolls() {
+		return pollService.getAllPolls();
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Poll> getPollById(@PathVariable Long id) {
+	@GetMapping("/{id}")
+	public ResponseEntity<Poll> getPollById(@PathVariable Long id) {
 
-        return pollService.getPollById(id)
-                // Extracts the Poll from Optional<Poll> and wraps it in a ResponseEntity
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+		return pollService.getPollById(id)
+				// Extracts the Poll from Optional<Poll> and wraps it in a ResponseEntity
+				.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	}
 
-    // Get all polls created by the authenticated user
-    @GetMapping("/my")
-    public List<Poll> getMyPolls(@AuthenticationPrincipal User currentUser) {
-        return pollService.getPollsByOwner(currentUser.getId());
-    }
+	// Get all polls created by the authenticated user
+	@GetMapping("/my")
+	public List<Poll> getMyPolls(@AuthenticationPrincipal User currentUser) {
+		return pollService.getPollsByOwner(currentUser.getId());
+	}
 
-    // Update a poll - only the owner can update their poll
-    @PutMapping("/{id}")
-    public ResponseEntity<Poll> updatePoll(@PathVariable Long id, @RequestBody Poll poll,
-                                           @AuthenticationPrincipal User currentUser) {
-        Poll updated = pollService.updatePoll(id, poll, currentUser);
-        return ResponseEntity.ok(updated);
-    }
+	// Update a poll - only the owner can update their poll
+	@PutMapping("/{id}")
+	public ResponseEntity<Poll> updatePoll(@PathVariable Long id, @RequestBody Poll poll,
+			@AuthenticationPrincipal User currentUser) {
+		Poll updated = pollService.updatePoll(id, poll, currentUser);
+		return ResponseEntity.ok(updated);
+	}
 
-    // Vote on a poll - requires authentication
-    // Users can change their vote (old option -1, new option +1)
-    @PostMapping("/vote")
-    public void doVote(@RequestBody Vote vote,
-                       @AuthenticationPrincipal User currentUser) {
-        pollService.doVote(vote.getPollId(), vote.getOptionIndex(), currentUser);
-    }
+	// Vote on a poll - requires authentication
+	// Users can change their vote (old option -1, new option +1)
+	@PostMapping("/vote")
+	public void doVote(@RequestBody Vote vote, @AuthenticationPrincipal User currentUser) {
+		pollService.doVote(vote.getPollId(), vote.getOptionIndex(), currentUser);
+	}
 
-    // Delete a poll - only the owner can delete their poll
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePoll(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
-        pollService.deletePoll(id, currentUser);
-        return ResponseEntity.noContent().build();
-    }
+	// Delete a poll - only the owner can delete their poll
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deletePoll(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
+		pollService.deletePoll(id, currentUser);
+		return ResponseEntity.noContent().build();
+	}
 }
