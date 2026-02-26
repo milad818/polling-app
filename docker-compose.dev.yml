@@ -1,0 +1,73 @@
+# =============================================================================
+# docker-compose.dev.yml  –  Development overrides
+#
+# Apply on top of the base compose file:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# What changes vs. production:
+#
+#   db        → port 3306 published to host so one can connect with DBeaver,
+#               MySQL Workbench, or any local DB client directly.
+#
+#   backend   → built from the "development" Dockerfile stage, which runs the
+#               app via `mvn spring-boot:run` instead of executing a fat JAR.
+#               Source is bind-mounted so edits on the host are immediately
+#               visible inside the container without rebuilding the image.
+#               Ports 8080 (HTTP) and 5005 (JDWP remote debug) are published.
+#
+#   frontend  → built from the "development" Dockerfile stage, which runs
+#               `ng serve` instead of building a static bundle for nginx.
+#               Source is bind-mounted for Angular's hot-module replacement.
+#               An anonymous volume shadows the container's node_modules so
+#               the host directory (possibly different OS) doesn't interfere.
+#               Port 4200 is published to the host.
+#               API_TARGET tells proxy.conf.js where to find the backend
+#               (Docker resolves the service name "backend" via internal DNS).
+#
+# Hot-reload notes:
+#   Angular   → HMR works out of the box; --poll 500 is set in the Dockerfile
+#               CMD as a fallback for volume mounts on Windows/macOS hosts
+#               where inotify events don't always cross the Docker bridge.
+#   Spring    → Add spring-boot-devtools to pom.xml to enable context restart
+#               on class-file changes.  Without it, backend changes require
+#               `docker compose restart backend` (source is already mounted,
+#               so no image rebuild needed).
+# =============================================================================
+
+services:
+
+  # Expose MySQL to the host so local DB tools can connect on 3306
+  db:
+    ports:
+      - "3306:3306"
+
+  # ── Backend development overrides ─────────────────────────────────────────
+  backend:
+    build:
+      target: development       # spring-boot:run instead of fat-JAR
+    volumes:
+      # Bind-mount source code – edits on the host appear instantly in container
+      - ./pollingapp/src:/app/src
+    ports:
+      - "8080:8080"             # Direct API access (Postman, curl, etc.)
+      - "5005:5005"             # Java Debug Wire Protocol (IDE remote debug)
+    environment:
+      # Disable caching and enable verbose output in dev
+      SPRING_JPA_SHOW_SQL: "true"
+
+  # ── Frontend development overrides ────────────────────────────────────────
+  frontend:
+    build:
+      target: development       # ng serve instead of nginx static
+    volumes:
+      # Source bind-mount for HMR
+      - ./pollingapp-client/src:/app/src
+      # Prevent the host node_modules (potentially Windows paths) from
+      # overriding the Alpine Linux node_modules installed inside the image
+      - /app/node_modules
+    ports:
+      - "4200:4200"
+    environment:
+      # proxy.conf.js reads this to forward /api/* to the backend service.
+      # Docker's embedded DNS resolves "backend" to the backend container IP.
+      API_TARGET: http://backend:8080

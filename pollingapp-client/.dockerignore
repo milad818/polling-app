@@ -1,0 +1,23 @@
+# Runtime output – the builder stage runs ng build inside the container
+dist/
+
+# Dependencies – the deps stage runs npm ci inside the container
+node_modules/
+
+# IDE and OS noise
+.vscode/
+.DS_Store
+
+# Git history
+.git/
+.gitignore
+
+# Secrets
+.env
+*.env
+
+# Test artefacts (tests run in CI, not in the Docker build)
+coverage/
+
+# Documentation
+*.md

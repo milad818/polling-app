@@ -1,0 +1,113 @@
+# =============================================================================
+# docker-compose.yml  –  Production stack
+#
+# Launch:   docker compose up --build
+# Stop:     docker compose down
+# Tear down + wipe DB:  docker compose down -v
+#
+# Secrets: copy .env.example to .env and fill in values before first run.
+#          The .env file is git-ignored; never commit real credentials.
+#
+# Service topology:
+#
+#   ┌──────────┐    /api/*    ┌──────────┐   SQL    ┌──────────┐
+#   │  browser │ ──────────── │  nginx   │ ──────── │  MySQL   │
+#   └──────────┘   */*        │ :80      │          │  db :3306│
+#                             └────┬─────┘          └──────────┘
+#                                  │ proxy_pass
+#                             ┌────▼─────┐
+#                             │ backend  │
+#                             │ :8080    │
+#                             └──────────┘
+#
+# Only port 80 is published to the host.  All inter-service traffic stays on
+# the private "polling-network" Docker network.
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # db – MySQL 8
+  #
+  # Data is stored in the named volume "db_data" so it survives container
+  # restarts and image upgrades.
+  #
+  # The health-check waits until mysqladmin can reach the daemon before
+  # declaring the service healthy.  The backend service depends on this so
+  # Spring Boot never tries to connect to a MySQL that isn't ready yet.
+  # ---------------------------------------------------------------------------
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: polling-app
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - polling-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # backend – Spring Boot
+  #
+  # The image is built from ./pollingapp/Dockerfile targeting the "production"
+  # stage (JRE-only, compiled JAR).
+  #
+  # Environment variables override application.properties at runtime using
+  # Spring Boot's relaxed binding:
+  #   SPRING_DATASOURCE_URL  →  spring.datasource.url
+  #   DB_PASSWORD            →  ${DB_PASSWORD} placeholder in properties file
+  #   JWT_SECRET             →  ${JWT_SECRET} placeholder in properties file
+  #
+  # The backend is intentionally not published to the host in production –
+  # all traffic reaches it through nginx.  This reduces the attack surface.
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./pollingapp
+      target: production
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/polling-app
+      SPRING_DATASOURCE_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - polling-network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # frontend – nginx + Angular SPA
+  #
+  # Serves the compiled Angular bundle and reverse-proxies /api/* to the
+  # backend container.  See pollingapp-client/nginx.conf for routing details.
+  # Port 80 is the only port exposed to the host in production.
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./pollingapp-client
+      target: production
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - polling-network
+    restart: unless-stopped
+
+# Named volume preserving MySQL data across container lifecycle
+volumes:
+  db_data:
+
+# Isolated network – services communicate by service name (Docker DNS)
+networks:
+  polling-network:
+    driver: bridge
