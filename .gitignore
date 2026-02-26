@@ -1,0 +1,14 @@
+# Root-level .gitignore
+# Each sub-project (pollingapp/, pollingapp-client/) has its own .gitignore
+# for language/framework specific patterns.  This file covers repo-wide rules.
+
+# ── Secrets ───────────────────────────────────────────────────────────────────
+# The .env file contains real credentials (DB_PASSWORD, JWT_SECRET).
+# .env.example is committed as a template; .env is never committed.
+.env
+*.env
+!.env.example
+
+# ── OS noise ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

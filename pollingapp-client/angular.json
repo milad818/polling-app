@@ -55,6 +55,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "src/proxy.conf.js"
+          },
           "configurations": {
             "production": {
               "buildTarget": "pollingapp-client:build:production"

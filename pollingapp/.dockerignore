@@ -1,0 +1,24 @@
+# Compiled output – the builder stage creates its own via Maven
+target/
+
+# IDE and OS noise
+.idea/
+*.iml
+.DS_Store
+.vscode/
+
+# Git history – not needed inside the image
+.git/
+.gitignore
+
+# Secrets – never bake secrets into the image
+.env
+*.env
+
+# Test reports and Spotless/Checkstyle caches
+surefire-reports/
+checkstyle-cachefile
+spotless-index
+
+# Documentation
+*.md

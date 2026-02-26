@@ -6,7 +6,6 @@ import org.polling.pollingapp.request.Vote;
 import org.polling.pollingapp.services.PollService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +21,6 @@ import java.util.List;
 // It tells Spring to take the JSON or XML data from the body of an HTTP request and "deserialize" it into a Java object.
 @RestController
 @RequestMapping("/api/polls")
-@CrossOrigin(origins = "http://localhost:4200/")
 public class PollController {
 	private final PollService pollService;
 

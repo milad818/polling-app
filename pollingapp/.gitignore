@@ -5,11 +5,12 @@ target/
 !**/src/test/**/target/
 
 ### Application Configuration ###
-src/main/resources/application.properties
+# application.properties is committed because it only contains env-var
+# Profile-specific overrides (application-dev.properties etc.) may contain
+# real credentials and remain ignored.
 src/main/resources/application-*.properties
 src/main/resources/application.yml
 src/main/resources/application-*.yml
-application.properties
 
 ### Test Configuration ###
 src/test/resources/application.properties
