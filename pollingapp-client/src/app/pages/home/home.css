@@ -5,7 +5,19 @@
   box-sizing: border-box;
 }
 
-/* ===== HEADER (moved from poll component) ===== */
+/* ===== MAIN CONTENT WRAPPER ===== */
+/* Offset right so content is never hidden behind the fixed sidebar */
+.home-main {
+  margin-left: 240px;
+  min-height: 100vh;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-main.sidebar-collapsed {
+  margin-left: 64px;
+}
+
+/* ===== HEADER ===== */
 .app-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 3rem 2rem;
@@ -73,7 +85,7 @@
   letter-spacing: 1px;
 }
 
-/* ===== TWO-COLUMN LAYOUT ===== */
+/* ===== BODY: TWO-COLUMN LAYOUT ===== */
 .home-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -83,9 +95,15 @@
   align-items: flex-start;
 }
 
+/* When profile column is hidden (non-dashboard sections) */
+.home-content.full-width .poll-column {
+  flex: 1;
+  max-width: 100%;
+}
+
 .poll-column {
   flex: 2;
-  min-width: 0; /* prevent flex child overflow */
+  min-width: 0;
 }
 
 .profile-column {
@@ -93,7 +111,7 @@
   position: sticky;
   top: 20px;
   min-width: 0;
-  z-index: 999; /* must sit above header & poll so the edit-profile modal covers the whole page */
+  z-index: 999;
 }
 
 .profile-actions {
@@ -111,31 +129,59 @@
   letter-spacing: 0.2px;
 }
 
-/* ===== LOGOUT LINK ===== */
-.logout-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  color: #6c757d;
+/* Profile-only full-width view */
+.profile-only-wrapper {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+  animation: profileFadeIn 0.4s ease-out;
+}
+
+@keyframes profileFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== COMING SOON PLACEHOLDER ===== */
+.coming-soon-card {
+  background: #ffffff;
+  border: 2px dashed #cbd5e0;
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  text-align: center;
+  animation: comingIn 0.4s ease-out;
+}
+
+@keyframes comingIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.coming-soon-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1.25rem;
+  color: #cbd5e0;
+}
+
+.coming-soon-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #4a5568;
+  margin: 0 0 0.75rem 0;
+}
+
+.coming-soon-subtitle {
   font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 4px 0;
-  margin-bottom: 0;
-  transition: color 0.2s ease;
-  text-decoration: none;
-  font-family: inherit;
-}
-
-.logout-link:hover {
-  color: #dc3545;
-  text-decoration: underline;
-}
-
-.logout-icon {
-  font-size: 0.95rem;
+  color: #718096;
+  margin: 0 auto;
+  max-width: 400px;
+  line-height: 1.6;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -146,11 +192,20 @@
 
   .profile-column {
     position: static;
-    order: -1; /* profile on top on mobile */
+    order: -1;
   }
 }
 
 @media (max-width: 768px) {
+  /* On mobile the sidebar always renders at 64px wide */
+  .home-main {
+    margin-left: 64px;
+  }
+
+  .home-main.sidebar-collapsed {
+    margin-left: 64px;
+  }
+
   .app-header {
     padding: 2rem 1.5rem;
     margin-bottom: 1.5rem;

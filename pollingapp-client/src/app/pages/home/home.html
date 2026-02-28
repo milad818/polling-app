@@ -1,22 +1,60 @@
-<div class="app-header">
-  <div class="header-content">
-    <h1 class="fancy-title">Polling App</h1>
-    <p class="header-subtitle">Create, Vote, and Manage Your Polls</p>
-  </div>
-</div>
+<!-- ===== SIDEBAR ===== -->
+<app-sidebar
+  (sectionChange)="onSectionChange($event)"
+  (collapsedChange)="onCollapsedChange($event)">
+</app-sidebar>
 
-<div class="home-content">
-  <div class="poll-column">
-    <app-poll></app-poll>
-  </div>
-  <div class="profile-column">
-    <div class="profile-actions">
-      <span class="welcome-greeting">{{ welcomeMessage }}</span>
-      <button class="logout-link" type="button" (click)="logout()">
-        <i class="fas fa-sign-out-alt logout-icon"></i>
-        Log out
-      </button>
+<!-- ===== MAIN AREA ===== -->
+<div class="home-main" [class.sidebar-collapsed]="sidebarCollapsed">
+
+  <!-- Header -->
+  <div class="app-header">
+    <div class="header-content">
+      <h1 class="fancy-title">Polling App</h1>
+      <p class="header-subtitle">{{ sectionTitle }}</p>
     </div>
-    <app-profile></app-profile>
+  </div>
+
+  <!-- Body -->
+  <div class="home-content" [class.full-width]="!showProfileColumn">
+
+    <!-- Profile-only view (Account > Profile) -->
+    @if (showOnlyProfile) {
+      <div class="profile-only-wrapper">
+        <app-profile></app-profile>
+      </div>
+    }
+
+    <!-- Poll / Placeholder column -->
+    @if (!showOnlyProfile) {
+      <div class="poll-column">
+
+        @if (showPollComponent) {
+          <app-poll [view]="activeView" [showCreate]="activeSection === 'dashboard'"></app-poll>
+        }
+
+        @if (showComingSoon) {
+          <div class="coming-soon-card">
+            <div class="coming-soon-icon">
+              <i class="fas fa-tools"></i>
+            </div>
+            <h2 class="coming-soon-title">{{ sectionTitle }}</h2>
+            <p class="coming-soon-subtitle">This feature is under development. Check back soon!</p>
+          </div>
+        }
+
+      </div>
+    }
+
+    <!-- Profile column (Dashboard only) -->
+    @if (showProfileColumn) {
+      <div class="profile-column">
+        <div class="profile-actions">
+          <span class="welcome-greeting">{{ welcomeMessage }}</span>
+        </div>
+        <app-profile></app-profile>
+      </div>
+    }
+
   </div>
 </div>
