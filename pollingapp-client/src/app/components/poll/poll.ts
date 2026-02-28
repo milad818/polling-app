@@ -1,4 +1,13 @@
-import { Component, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, inject, HostListener, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  ChangeDetectorRef,
+  inject,
+  HostListener,
+  Input,
+} from '@angular/core';
 import { PollService } from '../../services/poll.service';
 import { SavedPollService } from '../../services/saved-poll.service';
 import { Poll } from '../../models/poll.model';

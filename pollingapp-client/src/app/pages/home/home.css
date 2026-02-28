@@ -142,7 +142,9 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .logout-btn:hover {

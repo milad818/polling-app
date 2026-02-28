@@ -1,6 +1,10 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed">
   <!-- ===== TOGGLE BUTTON ===== -->
-  <button class="sidebar-toggle" (click)="toggle()" title="{{ isCollapsed ? 'Expand sidebar' : 'Collapse sidebar' }}">
+  <button
+    class="sidebar-toggle"
+    (click)="toggle()"
+    title="{{ isCollapsed ? 'Expand sidebar' : 'Collapse sidebar' }}"
+  >
     <i class="fas" [class.fa-bars]="isCollapsed" [class.fa-times]="!isCollapsed"></i>
   </button>
 
@@ -12,7 +16,6 @@
 
   <!-- ===== NAVIGATION ===== -->
   <nav class="sidebar-nav">
-
     <!-- Dashboard -->
     <div
       class="nav-item"
@@ -102,7 +105,10 @@
       >
         <span class="nav-icon"><i class="fas fa-lightbulb"></i></span>
         <span class="nav-label">Insights</span>
-        <i class="fas fa-chevron-down group-arrow" [class.rotated]="isGroupExpanded('insights')"></i>
+        <i
+          class="fas fa-chevron-down group-arrow"
+          [class.rotated]="isGroupExpanded('insights')"
+        ></i>
       </div>
 
       <div class="nav-group-children" [class.expanded]="isGroupExpanded('insights')">
@@ -193,7 +199,6 @@
         </div>
       </div>
     </div>
-
   </nav>
 
   <!-- ===== FOOTER ===== -->

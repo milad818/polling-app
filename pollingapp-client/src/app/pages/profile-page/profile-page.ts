@@ -71,21 +71,25 @@ export class ProfilePageComponent implements OnInit {
     this.populateForm(cached);
 
     // Refresh from API in background; 5 s timeout guards against slow servers.
-    this.userService.getCurrentUser().pipe(
-      timeout(5000),
-      catchError(() => {
-        this.loadError = 'Server unreachable — showing cached data. Live changes will sync when the backend is online.';
-        return of(null);
-      }),
-    ).subscribe((user) => {
-      if (user) {
-        this.profile = user;        // Cache avatarUrl so the next page load shows it immediately.
-        localStorage.setItem('user_avatar_url', user.avatarUrl ?? '');        // Only overwrite form fields if the user hasn\'t started editing yet.
-        if (!this.userHasEdited) {
-          this.populateForm(user);
+    this.userService
+      .getCurrentUser()
+      .pipe(
+        timeout(5000),
+        catchError(() => {
+          this.loadError =
+            'Server unreachable — showing cached data. Live changes will sync when the backend is online.';
+          return of(null);
+        }),
+      )
+      .subscribe((user) => {
+        if (user) {
+          this.profile = user; // Cache avatarUrl so the next page load shows it immediately.
+          localStorage.setItem('user_avatar_url', user.avatarUrl ?? ''); // Only overwrite form fields if the user hasn\'t started editing yet.
+          if (!this.userHasEdited) {
+            this.populateForm(user);
+          }
         }
-      }
-    });
+      });
   }
 
   private populateForm(user: UserProfile): void {
@@ -106,7 +110,9 @@ export class ProfilePageComponent implements OnInit {
         this.formGender = extras.gender ?? '';
         this.formDateOfBirth = extras.dateOfBirth ?? '';
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   markEdited(): void {
@@ -175,7 +181,12 @@ export class ProfilePageComponent implements OnInit {
   }
 
   get avatarInitials(): string {
-    const name = this.formFirstName || this.formDisplayName || this.formUsername || this.profile?.username || '?';
+    const name =
+      this.formFirstName ||
+      this.formDisplayName ||
+      this.formUsername ||
+      this.profile?.username ||
+      '?';
     return name.charAt(0).toUpperCase();
   }
 
@@ -183,9 +194,13 @@ export class ProfilePageComponent implements OnInit {
     if (!dateStr) return '—';
     try {
       return new Date(dateStr).toLocaleDateString('en-US', {
-        month: 'long', day: 'numeric', year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
       });
-    } catch { return dateStr; }
+    } catch {
+      return dateStr;
+    }
   }
 
   onSectionChange(section: string): void {

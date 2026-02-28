@@ -2,12 +2,12 @@
 <app-sidebar
   [activeSection]="activeSection"
   (sectionChange)="onSectionChange($event)"
-  (collapsedChange)="onCollapsedChange($event)">
+  (collapsedChange)="onCollapsedChange($event)"
+>
 </app-sidebar>
 
 <!-- ===== MAIN AREA ===== -->
 <div class="home-main" [class.sidebar-collapsed]="sidebarCollapsed">
-
   <!-- Header -->
   <div class="app-header">
     <div class="header-content">
@@ -18,10 +18,8 @@
 
   <!-- Body -->
   <div class="home-content" [class.full-width]="!showProfileColumn">
-
     <!-- Poll / Placeholder column -->
     <div class="poll-column">
-
       @if (showPollComponent) {
         <app-poll [view]="activeView" [showCreate]="activeSection === 'dashboard'"></app-poll>
       }
@@ -35,7 +33,6 @@
           <p class="coming-soon-subtitle">This feature is under development. Check back soon!</p>
         </div>
       }
-
     </div>
 
     <!-- Profile column (Dashboard only) -->
@@ -50,6 +47,5 @@
         <app-profile></app-profile>
       </div>
     }
-
   </div>
 </div>
