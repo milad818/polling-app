@@ -3,9 +3,13 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 
 const GROUP_MAP: Record<string, string> = {
-  'all-polls': 'polls', 'my-polls': 'polls', 'saved-polls': 'polls',
-  'analytics': 'insights', 'reports': 'insights',
-  'profile': 'account', 'settings': 'account',
+  'all-polls': 'polls',
+  'my-polls': 'polls',
+  'saved-polls': 'polls',
+  analytics: 'insights',
+  reports: 'insights',
+  profile: 'account',
+  settings: 'account',
 };
 
 @Component({

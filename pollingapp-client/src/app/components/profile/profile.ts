@@ -37,7 +37,9 @@ export class ProfileComponent implements OnInit {
         if (full) return full;
         if (extras.displayName) return extras.displayName;
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return '';
   }
 

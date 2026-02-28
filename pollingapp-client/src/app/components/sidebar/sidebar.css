@@ -58,7 +58,7 @@
 }
 
 .logo-icon {
-  font-size: 2.0rem;
+  font-size: 2rem;
   color: #a78bfa;
   flex-shrink: 0;
   width: 36px;
@@ -206,7 +206,9 @@
 .group-arrow {
   margin-left: auto;
   font-size: 0.7rem;
-  transition: transform 0.25s ease, opacity 0.2s ease;
+  transition:
+    transform 0.25s ease,
+    opacity 0.2s ease;
   flex-shrink: 0;
   opacity: 0.6;
 }
