@@ -1,5 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef, inject, HostListener } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, inject, HostListener, Input } from '@angular/core';
 import { PollService } from '../../services/poll.service';
+import { SavedPollService } from '../../services/saved-poll.service';
 import { Poll } from '../../models/poll.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './poll.html',
   styleUrl: './poll.css',
 })
-export class PollComponent implements OnInit {
+export class PollComponent implements OnInit, OnChanges {
   // New poll is initialized with two options - a poll can have at least 2 options
   newPoll: Poll = {
     id: 0,
@@ -24,6 +25,25 @@ export class PollComponent implements OnInit {
 
   polls: Poll[] = [];
 
+  @Input() view: 'all' | 'mine' | 'saved' = 'all';
+  @Input() showCreate = false;
+
+  searchQuery = '';
+
+  get filteredPolls(): Poll[] {
+    let result = this.polls;
+    if (this.view === 'mine') {
+      result = result.filter((p) => this.isOwnPoll(p));
+    } else if (this.view === 'saved') {
+      result = result.filter((p) => this.savedPollService.isSaved(p.id));
+    }
+    const q = this.searchQuery.trim().toLowerCase();
+    if (q) {
+      result = result.filter((p) => p.question.toLowerCase().includes(q));
+    }
+    return result;
+  }
+
   // Confirmation modal state
   showDeleteConfirmation = false;
   pollToDelete: number | null = null;
@@ -34,12 +54,21 @@ export class PollComponent implements OnInit {
   userVotes: Record<number, number> = {};
 
   private pollService = inject(PollService);
+  private savedPollService = inject(SavedPollService);
   private cdr = inject(ChangeDetectorRef);
   private authService = inject(AuthService);
 
   // Use ngOnInit for initialization logic
   ngOnInit(): void {
     this.loadPolls();
+  }
+
+  // Reset search whenever the parent switches the view
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['view'] && !changes['view'].firstChange) {
+      this.searchQuery = '';
+      this.cdr.detectChanges();
+    }
   }
 
   get currentUserId(): number | null {
@@ -65,9 +94,18 @@ export class PollComponent implements OnInit {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
-  // Check if current user owns this poll
   isOwnPoll(poll: Poll): boolean {
     return !!poll.owner && poll.owner.id === this.currentUserId;
+  }
+
+  isSaved(pollId: number): boolean {
+    return this.savedPollService.isSaved(pollId);
+  }
+
+  toggleSave(event: Event, pollId: number): void {
+    event.stopPropagation();
+    this.savedPollService.toggle(pollId);
+    this.cdr.detectChanges();
   }
 
   // Fetch data from the database

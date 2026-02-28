@@ -28,4 +28,16 @@ export class PollService {
   deletePoll(pollId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${pollId}`);
   }
+
+  // Save/unsave — handled client-side via SavedPollService until backend is ready.
+  // TODO (backend): POST /api/polls/{id}/save  and  DELETE /api/polls/{id}/save
+
+  /**
+   * Returns polls that the authenticated user has saved.
+   * TODO (backend): replace with GET /api/polls/saved
+   * and remove the SavedPollService.snapshot filter in PollComponent.
+   */
+  getSavedPolls(_savedIds: Set<number>, allPolls: Poll[]): Poll[] {
+    return allPolls.filter((p) => _savedIds.has(p.id));
+  }
 }

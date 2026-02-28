@@ -1,6 +1,7 @@
 <div class="app-container">
-  <h3 class="app-instruction">Below you can create and manage your own polls.</h3>
-  <div class="new-poll-container">
+  @if (showCreate) {
+    <h3 class="app-instruction">Below you can create and manage your own polls.</h3>
+    <div class="new-poll-container">
     <h4 class="new-poll-instruction">Create Poll</h4>
 
     <form #pollForm="ngForm" class="new-poll-form" (ngSubmit)="createPoll()">
@@ -74,8 +75,48 @@
       </div>
     </form>
   </div>
+  }
   <h4 class="app-instruction">Available polls:</h4>
-  @for (poll of polls; track poll.id) {
+
+  <!-- Search bar (hidden for Saved Polls which has its own empty state) -->
+  @if (view !== 'saved') {
+    <div class="search-bar-wrapper">
+      <span class="search-icon"><i class="fas fa-search"></i></span>
+      <input
+        class="search-bar"
+        type="text"
+        [(ngModel)]="searchQuery"
+        name="pollSearch"
+        placeholder="Search polls by keyword…"
+        autocomplete="off"
+      />
+      @if (searchQuery) {
+        <button class="search-clear" type="button" (click)="searchQuery = ''" title="Clear search">
+          <i class="fas fa-times"></i>
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Saved Polls empty-state -->
+  @if (view === 'saved' && filteredPolls.length === 0) {
+    <div class="empty-state">
+      <i class="fas fa-bookmark empty-state-icon"></i>
+      <p class="empty-state-title">No saved polls yet</p>
+      <p class="empty-state-sub">Tap the bookmark on any poll to save it here.</p>
+    </div>
+  }
+
+  <!-- No results after filtering -->
+  @if (view !== 'saved' && filteredPolls.length === 0 && polls.length > 0) {
+    <div class="empty-state">
+      <i class="fas fa-search empty-state-icon"></i>
+      <p class="empty-state-title">No polls match "{{ searchQuery }}"</p>
+      <p class="empty-state-sub">Try a different keyword.</p>
+    </div>
+  }
+
+  @for (poll of filteredPolls; track poll.id) {
     <div class="polls-container">
       <div class="poll-container">
         @if (isOwnPoll(poll)) {
@@ -114,6 +155,15 @@
         </div>
         <div class="poll-footer">
           <span class="poll-date">{{ formatDate(poll.createdAt) }}</span>
+          <button
+            class="save-poll-btn"
+            type="button"
+            [class.saved]="isSaved(poll.id)"
+            (click)="toggleSave($event, poll.id)"
+            [title]="isSaved(poll.id) ? 'Remove from saved' : 'Save poll'"
+          >
+            <i class="fas fa-bookmark"></i>
+          </button>
           <span class="poll-creator">{{ poll.owner?.username || 'Unknown' }}</span>
         </div>
       </div>
