@@ -3,6 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService, UserProfile, UpdateProfileRequest } from '../../services/user.service';
 
+interface ProfileExtrasCache {
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+}
+
 @Component({
   selector: 'app-profile',
   imports: [CommonModule, FormsModule],
@@ -21,6 +27,20 @@ export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
 
+  /** Read-only name derived from the profile-page extras cache. */
+  get displayFullName(): string {
+    try {
+      const raw = localStorage.getItem('profileExtras');
+      if (raw) {
+        const extras: ProfileExtrasCache = JSON.parse(raw);
+        const full = [extras.firstName, extras.lastName].filter(Boolean).join(' ');
+        if (full) return full;
+        if (extras.displayName) return extras.displayName;
+      }
+    } catch { /* ignore */ }
+    return '';
+  }
+
   ngOnInit(): void {
     this.loadProfile();
   }
@@ -30,6 +50,8 @@ export class ProfileComponent implements OnInit {
     this.userService.getCurrentUser().subscribe({
       next: (user) => {
         this.profile = user;
+        // Keep avatar cached so the profile page can render it immediately.
+        localStorage.setItem('user_avatar_url', user.avatarUrl ?? '');
         this.isLoading = false;
         this.cdr.detectChanges();
       },

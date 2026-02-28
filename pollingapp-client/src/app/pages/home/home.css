@@ -8,7 +8,7 @@
 /* ===== MAIN CONTENT WRAPPER ===== */
 /* Offset right so content is never hidden behind the fixed sidebar */
 .home-main {
-  margin-left: 240px;
+  margin-left: 320px; /* matches sidebar expanded width */
   min-height: 100vh;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -129,17 +129,29 @@
   letter-spacing: 0.2px;
 }
 
-/* Profile-only full-width view */
-.profile-only-wrapper {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0 20px 40px;
-  animation: profileFadeIn 0.4s ease-out;
+/* ===== LOGOUT LINK ===== */
+.logout-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e74c3c;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
-@keyframes profileFadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+.logout-btn:hover {
+  color: #c0392b;
+  text-decoration: underline;
+}
+
+.logout-btn:active {
+  opacity: 0.7;
 }
 
 /* ===== COMING SOON PLACEHOLDER ===== */

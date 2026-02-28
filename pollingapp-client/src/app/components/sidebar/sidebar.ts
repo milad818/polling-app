@@ -1,7 +1,12 @@
-import { Component, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+
+const GROUP_MAP: Record<string, string> = {
+  'all-polls': 'polls', 'my-polls': 'polls', 'saved-polls': 'polls',
+  'analytics': 'insights', 'reports': 'insights',
+  'profile': 'account', 'settings': 'account',
+};
 
 @Component({
   selector: 'app-sidebar',
@@ -9,15 +14,19 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnChanges {
+  @Input() activeSection = 'dashboard';
   @Output() sectionChange = new EventEmitter<string>();
   @Output() collapsedChange = new EventEmitter<boolean>();
 
   isCollapsed = false;
-  activeSection = 'dashboard';
   expandedGroups = new Set<string>(['polls']);
 
-  private router = inject(Router);
+  ngOnChanges(): void {
+    const group = GROUP_MAP[this.activeSection];
+    if (group) this.expandedGroups.add(group);
+  }
+
   private authService = inject(AuthService);
 
   toggle(): void {
@@ -51,6 +60,5 @@ export class SidebarComponent {
 
   onLogout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }
