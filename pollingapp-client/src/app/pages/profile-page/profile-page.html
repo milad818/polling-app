@@ -1,0 +1,161 @@
+<!-- ===== SIDEBAR ===== -->
+<app-sidebar
+  [activeSection]="'profile'"
+  (sectionChange)="onSectionChange($event)"
+  (collapsedChange)="onCollapsedChange($event)">
+</app-sidebar>
+
+<!-- ===== MAIN AREA ===== -->
+<div class="profile-main" [class.sidebar-collapsed]="sidebarCollapsed">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Polling App</h1>
+      <p class="page-subtitle">My Profile</p>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="profile-body">
+
+    <!-- Server warning banner -->
+    @if (loadError) {
+        <div class="banner warn-banner">
+          <i class="fas fa-exclamation-triangle"></i> {{ loadError }}
+        </div>
+      }
+
+      <!-- Save feedback -->
+      @if (saveSuccess) {
+        <div class="banner success-banner">
+          <i class="fas fa-check-circle"></i> Profile saved successfully!
+        </div>
+      }
+      @if (saveError) {
+        <div class="banner error-banner">
+          <i class="fas fa-times-circle"></i> {{ saveError }}
+        </div>
+      }
+
+      <!-- Profile Card -->
+      <div class="profile-card">
+
+        <!-- Avatar + Identity -->
+        <div class="avatar-section">
+          <div
+            class="avatar-circle"
+            role="button"
+            tabindex="0"
+            aria-label="Upload profile picture"
+            title="Click to change picture"
+            (click)="avatarInput.click()"
+            (keydown.enter)="avatarInput.click()"
+          >
+            @if (formAvatarUrl) {
+              <img [src]="formAvatarUrl" alt="Profile picture" class="avatar-img" />
+            } @else {
+              <span class="avatar-initial">{{ avatarInitials }}</span>
+            }
+            <div class="avatar-overlay"><i class="fas fa-camera"></i></div>
+          </div>
+          <input #avatarInput type="file" accept="image/*" hidden (change)="onAvatarFileSelected($event)" />
+
+          <div class="identity">
+            <h2 class="identity-name">{{ fullName || formDisplayName || formUsername }}</h2>
+            @if (profile) {
+              <p class="identity-email">{{ profile.email }}</p>
+              @if (profile.createdAt) {
+                <p class="identity-since"><i class="fas fa-calendar-alt"></i> Joined {{ formatDate(profile.createdAt) }}</p>
+              }
+            }
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Edit Form -->
+        <form class="profile-form" (ngSubmit)="saveProfile()">
+
+          <!-- Section: Basic Info -->
+          <div class="form-section-title">Basic Information</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fFirstName">First Name <span class="badge soon">Coming soon</span></label>
+              <input id="fFirstName" type="text" [(ngModel)]="formFirstName" (ngModelChange)="markEdited()" name="firstName" maxlength="50" placeholder="e.g. John" />
+            </div>
+            <div class="form-group">
+              <label for="fLastName">Last Name <span class="badge soon">Coming soon</span></label>
+              <input id="fLastName" type="text" [(ngModel)]="formLastName" (ngModelChange)="markEdited()" name="lastName" maxlength="50" placeholder="e.g. Doe" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fUsername">Username <span class="badge live">Live</span></label>
+              <input id="fUsername" type="text" [(ngModel)]="formUsername" (ngModelChange)="markEdited()" name="username" maxlength="50" placeholder="e.g. john_doe" />
+            </div>
+            <div class="form-group">
+              <label for="fDisplayName">Display Name <span class="badge soon">Coming soon</span></label>
+              <input id="fDisplayName" type="text" [(ngModel)]="formDisplayName" (ngModelChange)="markEdited()" name="displayName" placeholder="e.g. John Doe" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="fEmail">Email <span class="badge readonly">Read-only</span></label>
+            <input id="fEmail" type="email" [value]="profile?.email ?? ''" disabled class="input-readonly" />
+          </div>
+
+          <div class="form-group">
+            <label for="fBio">Bio <span class="badge live">Live</span></label>
+            <textarea id="fBio" [(ngModel)]="formBio" (ngModelChange)="markEdited()" name="bio" rows="3" maxlength="255" placeholder="Tell us something about yourself..."></textarea>
+            <span class="char-count">{{ formBio.length }} / 255</span>
+          </div>
+
+          <!-- Section: Personal Details (placeholders) -->
+          <div class="form-section-title">Personal Details <span class="badge soon">Backend coming soon</span></div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fDob">Date of Birth</label>
+              <input id="fDob" type="date" [(ngModel)]="formDateOfBirth" name="dob" />
+            </div>
+            <div class="form-group">
+              <label for="fGender">Gender</label>
+              <select id="fGender" [(ngModel)]="formGender" name="gender">
+                <option value="">Prefer not to say</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="nonbinary">Non-binary</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fLocation">Location</label>
+              <input id="fLocation" type="text" [(ngModel)]="formLocation" name="location" placeholder="e.g. New York, USA" />
+            </div>
+            <div class="form-group">
+              <label for="fWebsite">Website</label>
+              <input id="fWebsite" type="url" [(ngModel)]="formWebsite" name="website" placeholder="https://example.com" />
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="submit" class="btn-save" [disabled]="isSaving">
+              @if (isSaving) {
+                <i class="fas fa-spinner fa-spin"></i> Saving...
+              } @else {
+                <i class="fas fa-check"></i> Save Changes
+              }
+            </button>
+          </div>
+
+        </form>
+      </div>
+  </div>
+</div>

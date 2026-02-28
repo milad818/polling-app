@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PollComponent } from '../../components/poll/poll';
 import { ProfileComponent } from '../../components/profile/profile';
 import { SidebarComponent } from '../../components/sidebar/sidebar';
@@ -13,17 +14,27 @@ export type PollView = 'all' | 'mine' | 'saved';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   sidebarCollapsed = false;
   activeSection = 'dashboard';
   activeView: PollView = 'all';
 
-  /** Sections that render the poll component with a search bar */
   readonly pollSections = new Set(['dashboard', 'all-polls', 'my-polls', 'saved-polls']);
   readonly profileSections = new Set(['dashboard']);
   readonly comingSoonSections = new Set(['analytics', 'reports', 'settings']);
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      const section = params['section'];
+      if (section) {
+        this.onSectionChange(section);
+      }
+    });
+  }
 
   get showPollComponent(): boolean {
     return this.pollSections.has(this.activeSection);
@@ -37,22 +48,23 @@ export class HomeComponent {
     return this.comingSoonSections.has(this.activeSection);
   }
 
-  get showOnlyProfile(): boolean {
-    return this.activeSection === 'profile';
-  }
-
   get sectionTitle(): string {
+    if (this.activeSection === 'dashboard') {
+      return 'Create, Vote, and Manage Your Polls';
+    }
     const labels: Record<string, string> = {
-      dashboard: 'Dashboard',
       'all-polls': 'All Polls',
       'my-polls': 'My Polls',
       'saved-polls': 'Saved Polls',
       analytics: 'Analytics',
       reports: 'Reports',
-      profile: 'Profile',
       settings: 'Settings',
     };
     return labels[this.activeSection] ?? 'Dashboard';
+  }
+
+  onLogout(): void {
+    this.authService.logout();
   }
 
   get welcomeMessage(): string {
@@ -61,6 +73,11 @@ export class HomeComponent {
   }
 
   onSectionChange(section: string): void {
+    if (section === 'profile') {
+      this.router.navigate(['/profile']);
+      return;
+    }
+
     this.activeSection = section;
     switch (section) {
       case 'dashboard':

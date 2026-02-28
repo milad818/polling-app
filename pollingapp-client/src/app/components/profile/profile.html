@@ -15,11 +15,17 @@
           </div>
         }
       </div>
-      <h3 class="profile-name">{{ profile.username }}</h3>
+      <h3 class="profile-name">{{ displayFullName || profile.username }}</h3>
     </div>
 
     <!-- Profile Info -->
     <div class="profile-info">
+      @if (displayFullName) {
+        <div class="info-row">
+          <span class="info-label">&#128100; Name</span>
+          <span class="info-value">{{ displayFullName }}</span>
+        </div>
+      }
       <div class="info-row">
         <span class="info-label">&#9993; Email</span>
         <span class="info-value">{{ profile.email }}</span>
