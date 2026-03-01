@@ -43,9 +43,16 @@ export class ProfilePageComponent implements OnInit {
 
   // Snapshot of values last loaded from the backend — used to diff on save.
   private snapshot = {
-    username: '', bio: '', avatarUrl: '',
-    firstName: '', lastName: '', displayName: '',
-    location: '', website: '', gender: '', dateOfBirth: '',
+    username: '',
+    bio: '',
+    avatarUrl: '',
+    firstName: '',
+    lastName: '',
+    displayName: '',
+    location: '',
+    website: '',
+    gender: '',
+    dateOfBirth: '',
   };
 
   // Form state
@@ -146,7 +153,9 @@ export class ProfilePageComponent implements OnInit {
         const extras: LocalProfileExtras = JSON.parse(raw);
         return extras[key] ?? '';
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return '';
   }
 
@@ -175,15 +184,15 @@ export class ProfilePageComponent implements OnInit {
       current !== original ? current : undefined;
 
     const data: UpdateProfileRequest = {
-      username:    changed(this.formUsername,    this.snapshot.username)    || undefined,
-      bio:         changed(this.formBio,         this.snapshot.bio),
-      avatarUrl:   changed(this.formAvatarUrl,   this.snapshot.avatarUrl)   || undefined,
-      firstName:   changed(this.formFirstName,   this.snapshot.firstName)   || undefined,
-      lastName:    changed(this.formLastName,     this.snapshot.lastName)    || undefined,
+      username: changed(this.formUsername, this.snapshot.username) || undefined,
+      bio: changed(this.formBio, this.snapshot.bio),
+      avatarUrl: changed(this.formAvatarUrl, this.snapshot.avatarUrl) || undefined,
+      firstName: changed(this.formFirstName, this.snapshot.firstName) || undefined,
+      lastName: changed(this.formLastName, this.snapshot.lastName) || undefined,
       displayName: changed(this.formDisplayName, this.snapshot.displayName) || undefined,
-      location:    changed(this.formLocation,    this.snapshot.location)    || undefined,
-      website:     changed(this.formWebsite,     this.snapshot.website)     || undefined,
-      gender:      changed(this.formGender,      this.snapshot.gender)      || undefined,
+      location: changed(this.formLocation, this.snapshot.location) || undefined,
+      website: changed(this.formWebsite, this.snapshot.website) || undefined,
+      gender: changed(this.formGender, this.snapshot.gender) || undefined,
       dateOfBirth: changed(this.formDateOfBirth, this.snapshot.dateOfBirth) || undefined,
     };
 
@@ -192,7 +201,10 @@ export class ProfilePageComponent implements OnInit {
     if (!hasChanges) {
       this.saveSuccess = true;
       this.cdr.detectChanges();
-      setTimeout(() => { this.saveSuccess = false; this.cdr.detectChanges(); }, 3000);
+      setTimeout(() => {
+        this.saveSuccess = false;
+        this.cdr.detectChanges();
+      }, 3000);
       return;
     }
 
@@ -201,15 +213,18 @@ export class ProfilePageComponent implements OnInit {
     this.saveSuccess = false;
 
     // Keep localStorage in sync as a warm cache.
-    localStorage.setItem(EXTRAS_KEY, JSON.stringify({
-      firstName:   this.formFirstName,
-      lastName:    this.formLastName,
-      displayName: this.formDisplayName,
-      location:    this.formLocation,
-      website:     this.formWebsite,
-      gender:      this.formGender,
-      dateOfBirth: this.formDateOfBirth,
-    }));
+    localStorage.setItem(
+      EXTRAS_KEY,
+      JSON.stringify({
+        firstName: this.formFirstName,
+        lastName: this.formLastName,
+        displayName: this.formDisplayName,
+        location: this.formLocation,
+        website: this.formWebsite,
+        gender: this.formGender,
+        dateOfBirth: this.formDateOfBirth,
+      }),
+    );
 
     this.userService.updateProfile(data).subscribe({
       next: (updatedUser) => {

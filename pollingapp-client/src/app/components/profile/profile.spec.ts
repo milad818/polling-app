@@ -293,9 +293,7 @@ describe('ProfileComponent', () => {
     });
 
     it('returns only firstName when lastName is null', () => {
-      userServiceMock.getCurrentUser.mockReturnValue(
-        of({ ...mockProfile, lastName: null }),
-      );
+      userServiceMock.getCurrentUser.mockReturnValue(of({ ...mockProfile, lastName: null }));
       fixture.detectChanges();
       expect(component.displayFullName).toBe('Alice');
     });
@@ -322,7 +320,10 @@ describe('ProfileComponent', () => {
       userServiceMock.getCurrentUser.mockReturnValue(
         of({ ...mockProfile, firstName: null, lastName: null, displayName: null }),
       );
-      localStorage.setItem('profileExtras', JSON.stringify({ firstName: 'Cached', lastName: 'Name' }));
+      localStorage.setItem(
+        'profileExtras',
+        JSON.stringify({ firstName: 'Cached', lastName: 'Name' }),
+      );
       fixture.detectChanges();
       expect(component.displayFullName).toBe('Cached Name');
     });
