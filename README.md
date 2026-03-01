@@ -1,3 +1,5 @@
+⚠️ **Note:** This project is currently under active development and is not yet complete. Features are being added incrementally.
+
 # 📊 Polling App
 
 A full-stack polling application where users can register, create and manage polls, vote, and maintain a personal profile. Built with a Spring Boot REST API and an Angular SPA.
@@ -18,16 +20,16 @@ A full-stack polling application where users can register, create and manage pol
 | **MySQL 8** | Relational database |
 | **JWT (jjwt)** | Stateless token-based auth |
 | **Lombok** | Boilerplate reduction |
-| **JUnit 5 / Mockito** | Unit testing (40 tests) |
+| **JUnit 5 / Mockito** | Unit testing |
 
 ### Frontend
 | | |
 |---|---|
-| **Angular 21** | SPA framework (standalone components, `@for` control flow) |
+| **Angular 21** | SPA framework |
 | **TypeScript 5.9** | Type-safe language |
 | **RxJS 7.8** | Reactive HTTP and state |
 | **Angular Forms** | Template-driven forms with validation |
-| **Vitest 4** | Unit test runner (124 tests) |
+| **Vitest 4** | Unit test runner |
 | **ESLint v9** | Linting (flat config, `@angular-eslint`, `typescript-eslint`) |
 | **Prettier 3** | Code formatting |
 | **Husky + lint-staged** | Pre-commit quality gates |
