@@ -131,4 +131,77 @@ class UserServiceTest {
 		assertThat(user.getBio()).isEqualTo("New bio");
 		verify(userRepository).save(user);
 	}
+
+	// ── Bio clearing behaviour ─────────────────────────────────────────
+
+	@Test
+	void updateProfile_clearsBio_whenEmptyStringProvided() {
+		// bio "" is the intentional "clear" signal
+		UpdateProfileRequest request = new UpdateProfileRequest();
+		request.setBio("");
+
+		when(userRepository.save(any(User.class))).thenReturn(user);
+
+		userService.updateProfile(user, request);
+
+		assertThat(user.getBio()).isNull();
+	}
+
+	@Test
+	void updateProfile_clearsBio_whenBlankStringProvided() {
+		UpdateProfileRequest request = new UpdateProfileRequest();
+		request.setBio("   ");
+
+		when(userRepository.save(any(User.class))).thenReturn(user);
+
+		userService.updateProfile(user, request);
+
+		assertThat(user.getBio()).isNull();
+	}
+
+	// ── New profile fields ─────────────────────────────────────────────
+
+	@Test
+	void updateProfile_setsAllNewProfileFields() {
+		UpdateProfileRequest request = new UpdateProfileRequest();
+		request.setFirstName("Alice");
+		request.setLastName("Smith");
+		request.setDisplayName("Alice S.");
+		request.setLocation("New York");
+		request.setWebsite("https://alice.dev");
+		request.setGender("Female");
+		request.setDateOfBirth("1990-01-15");
+
+		when(userRepository.save(any(User.class))).thenReturn(user);
+
+		userService.updateProfile(user, request);
+
+		assertThat(user.getFirstName()).isEqualTo("Alice");
+		assertThat(user.getLastName()).isEqualTo("Smith");
+		assertThat(user.getDisplayName()).isEqualTo("Alice S.");
+		assertThat(user.getLocation()).isEqualTo("New York");
+		assertThat(user.getWebsite()).isEqualTo("https://alice.dev");
+		assertThat(user.getGender()).isEqualTo("Female");
+		assertThat(user.getDateOfBirth()).isEqualTo("1990-01-15");
+	}
+
+	@Test
+	void updateProfile_ignoresBlankAndNullNewFields_keepsExistingValues() {
+		user.setFirstName("Alice");
+		user.setLastName("Smith");
+		user.setLocation("Paris");
+
+		UpdateProfileRequest request = new UpdateProfileRequest();
+		request.setFirstName("   "); // blank → ignored
+		request.setLastName(null); // null → ignored
+		request.setLocation(""); // blank → ignored
+
+		when(userRepository.save(any(User.class))).thenReturn(user);
+
+		userService.updateProfile(user, request);
+
+		assertThat(user.getFirstName()).isEqualTo("Alice");
+		assertThat(user.getLastName()).isEqualTo("Smith");
+		assertThat(user.getLocation()).isEqualTo("Paris");
+	}
 }

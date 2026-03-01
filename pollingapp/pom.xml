@@ -126,7 +126,7 @@
                             plus the tweaks below.
                         -->
                         <eclipse>
-                            <version>4.33</version>
+                            <version>4.34</version>
                         </eclipse>
                         <!-- Remove unused imports -->
                         <removeUnusedImports/>
@@ -153,6 +153,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
                     <consoleOutput>true</consoleOutput>

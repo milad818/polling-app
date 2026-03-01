@@ -46,6 +46,26 @@ public class User {
 	@Column(columnDefinition = "LONGTEXT")
 	private String avatarUrl;
 
+	@Size(max = 50)
+	private String firstName;
+
+	@Size(max = 50)
+	private String lastName;
+
+	@Size(max = 100)
+	private String displayName;
+
+	@Size(max = 100)
+	private String location;
+
+	@Size(max = 255)
+	private String website;
+
+	@Size(max = 20)
+	private String gender;
+
+	private String dateOfBirth;
+
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 }

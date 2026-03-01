@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,7 +7,9 @@ import { SidebarComponent } from '../../components/sidebar/sidebar';
 import { UserService, UserProfile, UpdateProfileRequest } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 
-// Fields not yet in the backend — stored locally until the backend is extended.
+// Local cache of profile extras — persisted to localStorage so the form
+// populates immediately on next visit without waiting for the API response.
+// The backend is now the source of truth; this is only a warm cache.
 export interface LocalProfileExtras {
   firstName: string;
   lastName: string;
@@ -30,6 +32,7 @@ export class ProfilePageComponent implements OnInit {
   private router = inject(Router);
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   sidebarCollapsed = false;
 
@@ -37,6 +40,13 @@ export class ProfilePageComponent implements OnInit {
   profile: UserProfile | null = null;
   loadError = '';
   private userHasEdited = false;
+
+  // Snapshot of values last loaded from the backend — used to diff on save.
+  private snapshot = {
+    username: '', bio: '', avatarUrl: '',
+    firstName: '', lastName: '', displayName: '',
+    location: '', website: '', gender: '', dateOfBirth: '',
+  };
 
   // Form state
   isSaving = false;
@@ -65,6 +75,13 @@ export class ProfilePageComponent implements OnInit {
       email: this.authService.getUserEmail() ?? '',
       bio: null,
       avatarUrl: localStorage.getItem('user_avatar_url') || null,
+      firstName: null,
+      lastName: null,
+      displayName: null,
+      location: null,
+      website: null,
+      gender: null,
+      dateOfBirth: null,
       createdAt: '',
     };
     this.profile = cached;
@@ -83,12 +100,13 @@ export class ProfilePageComponent implements OnInit {
       )
       .subscribe((user) => {
         if (user) {
-          this.profile = user; // Cache avatarUrl so the next page load shows it immediately.
-          localStorage.setItem('user_avatar_url', user.avatarUrl ?? ''); // Only overwrite form fields if the user hasn\'t started editing yet.
+          this.profile = user;
+          localStorage.setItem('user_avatar_url', user.avatarUrl ?? '');
           if (!this.userHasEdited) {
             this.populateForm(user);
           }
         }
+        this.cdr.detectChanges();
       });
   }
 
@@ -97,22 +115,39 @@ export class ProfilePageComponent implements OnInit {
     this.formBio = user.bio ?? '';
     this.formAvatarUrl = user.avatarUrl ?? '';
 
-    // Load extras saved locally
+    this.formFirstName = user.firstName ?? this.readExtra('firstName');
+    this.formLastName = user.lastName ?? this.readExtra('lastName');
+    this.formDisplayName = user.displayName ?? this.readExtra('displayName');
+    this.formLocation = user.location ?? this.readExtra('location');
+    this.formWebsite = user.website ?? this.readExtra('website');
+    this.formGender = user.gender ?? this.readExtra('gender');
+    this.formDateOfBirth = user.dateOfBirth ?? this.readExtra('dateOfBirth');
+
+    // Take a snapshot so saveProfile() can send only the changed fields.
+    this.snapshot = {
+      username: this.formUsername,
+      bio: this.formBio,
+      avatarUrl: this.formAvatarUrl,
+      firstName: this.formFirstName,
+      lastName: this.formLastName,
+      displayName: this.formDisplayName,
+      location: this.formLocation,
+      website: this.formWebsite,
+      gender: this.formGender,
+      dateOfBirth: this.formDateOfBirth,
+    };
+  }
+
+  /** Read a single field from the legacy localStorage extras cache. */
+  private readExtra(key: keyof LocalProfileExtras): string {
     try {
       const raw = localStorage.getItem(EXTRAS_KEY);
       if (raw) {
         const extras: LocalProfileExtras = JSON.parse(raw);
-        this.formFirstName = extras.firstName ?? '';
-        this.formLastName = extras.lastName ?? '';
-        this.formDisplayName = extras.displayName ?? '';
-        this.formLocation = extras.location ?? '';
-        this.formWebsite = extras.website ?? '';
-        this.formGender = extras.gender ?? '';
-        this.formDateOfBirth = extras.dateOfBirth ?? '';
+        return extras[key] ?? '';
       }
-    } catch {
-      /* ignore */
-    }
+    } catch { /* ignore */ }
+    return '';
   }
 
   markEdited(): void {
@@ -124,54 +159,80 @@ export class ProfilePageComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
     const file = input.files[0];
-    if (file.size > 512000) {
-      this.saveError = 'Image must be smaller than 500 KB.';
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.formAvatarUrl = reader.result as string;
-      this.saveError = '';
-    };
-    reader.readAsDataURL(file);
+
+    // We only store a URL string in the DB, not the raw image.
+    // For now, create a local object URL for preview; the user should
+    // paste an external URL into the field or use a future upload endpoint.
+    // Object URLs are only valid during this browser session.
+    const previewUrl = URL.createObjectURL(file);
+    this.formAvatarUrl = previewUrl;
+    this.saveError = '';
   }
 
   saveProfile(): void {
+    // Build a request containing only fields whose values differ from the snapshot.
+    const changed = <T>(current: T, original: T): T | undefined =>
+      current !== original ? current : undefined;
+
+    const data: UpdateProfileRequest = {
+      username:    changed(this.formUsername,    this.snapshot.username)    || undefined,
+      bio:         changed(this.formBio,         this.snapshot.bio),
+      avatarUrl:   changed(this.formAvatarUrl,   this.snapshot.avatarUrl)   || undefined,
+      firstName:   changed(this.formFirstName,   this.snapshot.firstName)   || undefined,
+      lastName:    changed(this.formLastName,     this.snapshot.lastName)    || undefined,
+      displayName: changed(this.formDisplayName, this.snapshot.displayName) || undefined,
+      location:    changed(this.formLocation,    this.snapshot.location)    || undefined,
+      website:     changed(this.formWebsite,     this.snapshot.website)     || undefined,
+      gender:      changed(this.formGender,      this.snapshot.gender)      || undefined,
+      dateOfBirth: changed(this.formDateOfBirth, this.snapshot.dateOfBirth) || undefined,
+    };
+
+    // If nothing changed, skip the network call entirely.
+    const hasChanges = Object.values(data).some((v) => v !== undefined);
+    if (!hasChanges) {
+      this.saveSuccess = true;
+      this.cdr.detectChanges();
+      setTimeout(() => { this.saveSuccess = false; this.cdr.detectChanges(); }, 3000);
+      return;
+    }
+
     this.isSaving = true;
     this.saveError = '';
     this.saveSuccess = false;
 
-    // Persist placeholder fields locally
-    const extras: LocalProfileExtras = {
-      firstName: this.formFirstName,
-      lastName: this.formLastName,
+    // Keep localStorage in sync as a warm cache.
+    localStorage.setItem(EXTRAS_KEY, JSON.stringify({
+      firstName:   this.formFirstName,
+      lastName:    this.formLastName,
       displayName: this.formDisplayName,
-      location: this.formLocation,
-      website: this.formWebsite,
-      gender: this.formGender,
+      location:    this.formLocation,
+      website:     this.formWebsite,
+      gender:      this.formGender,
       dateOfBirth: this.formDateOfBirth,
-    };
-    localStorage.setItem(EXTRAS_KEY, JSON.stringify(extras));
-
-    const data: UpdateProfileRequest = {
-      username: this.formUsername,
-      bio: this.formBio,
-      avatarUrl: this.formAvatarUrl || undefined,
-    };
+    }));
 
     this.userService.updateProfile(data).subscribe({
       next: (updatedUser) => {
         this.profile = updatedUser;
         if (updatedUser.username) {
           localStorage.setItem('username', updatedUser.username);
+          localStorage.setItem('user_avatar_url', updatedUser.avatarUrl ?? '');
         }
+        // Refresh form with canonical values from the backend.
+        this.userHasEdited = false;
+        this.populateForm(updatedUser);
         this.isSaving = false;
         this.saveSuccess = true;
-        setTimeout(() => (this.saveSuccess = false), 3000);
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.saveSuccess = false;
+          this.cdr.detectChanges();
+        }, 3000);
       },
       error: (err) => {
         this.saveError = err.error?.message || err.error || 'Failed to save changes.';
         this.isSaving = false;
+        this.cdr.detectChanges();
       },
     });
   }

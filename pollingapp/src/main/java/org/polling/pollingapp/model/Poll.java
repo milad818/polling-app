@@ -37,7 +37,8 @@ public class Poll {
 	// column name
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "owner_id")
-	@JsonIgnoreProperties({"passwordHash", "bio", "avatarUrl", "createdAt"})
+	@JsonIgnoreProperties({"passwordHash", "bio", "avatarUrl", "firstName", "lastName", "displayName", "location",
+			"website", "gender", "dateOfBirth", "createdAt"})
 	private User owner;
 
 	private LocalDateTime createdAt = LocalDateTime.now();

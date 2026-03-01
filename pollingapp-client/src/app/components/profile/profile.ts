@@ -27,8 +27,14 @@ export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
 
-  /** Read-only name derived from the profile-page extras cache. */
+  /** Full name from the API response, with localStorage cache as fallback. */
   get displayFullName(): string {
+    if (this.profile) {
+      const full = [this.profile.firstName, this.profile.lastName].filter(Boolean).join(' ');
+      if (full) return full;
+      if (this.profile.displayName) return this.profile.displayName;
+    }
+    // Fallback: localStorage cache written by profile-page on save.
     try {
       const raw = localStorage.getItem('profileExtras');
       if (raw) {
