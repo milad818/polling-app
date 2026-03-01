@@ -10,6 +10,13 @@ const mockProfile: UserProfile = {
   email: 'alice@example.com',
   bio: 'Hello world',
   avatarUrl: 'https://example.com/avatar.png',
+  firstName: 'Alice',
+  lastName: 'Smith',
+  displayName: 'Alice S.',
+  location: 'Paris',
+  website: 'https://alice.dev',
+  gender: 'Female',
+  dateOfBirth: '1990-01-15',
   createdAt: '2026-01-15T10:00:00',
 };
 
@@ -144,6 +151,13 @@ describe('ProfileComponent', () => {
       bio: 'New bio',
       avatarUrl: null,
       createdAt: '2026-01-15T10:00:00',
+      firstName: null,
+      lastName: null,
+      displayName: null,
+      location: null,
+      website: null,
+      gender: null,
+      dateOfBirth: null,
     };
 
     beforeEach(() => {
@@ -268,6 +282,56 @@ describe('ProfileComponent', () => {
 
     it('returns a string containing the day', () => {
       expect(component.formatDate('2026-01-15T10:00:00')).toContain('15');
+    });
+  });
+
+  // ── displayFullName getter ─────────────────────────────────
+  describe('displayFullName', () => {
+    it('returns firstName + lastName when both are set on the profile', () => {
+      fixture.detectChanges();
+      expect(component.displayFullName).toBe('Alice Smith');
+    });
+
+    it('returns only firstName when lastName is null', () => {
+      userServiceMock.getCurrentUser.mockReturnValue(of({ ...mockProfile, lastName: null }));
+      fixture.detectChanges();
+      expect(component.displayFullName).toBe('Alice');
+    });
+
+    it('falls back to displayName when firstName and lastName are both null', () => {
+      userServiceMock.getCurrentUser.mockReturnValue(
+        of({ ...mockProfile, firstName: null, lastName: null, displayName: 'Alice S.' }),
+      );
+      fixture.detectChanges();
+      expect(component.displayFullName).toBe('Alice S.');
+    });
+
+    it('returns empty string when all name fields are null', () => {
+      userServiceMock.getCurrentUser.mockReturnValue(
+        of({ ...mockProfile, firstName: null, lastName: null, displayName: null }),
+      );
+      fixture.detectChanges();
+      // No localStorage cache set, so should be empty
+      localStorage.removeItem('profileExtras');
+      expect(component.displayFullName).toBe('');
+    });
+
+    it('falls back to localStorage profileExtras when profile has no name fields', () => {
+      userServiceMock.getCurrentUser.mockReturnValue(
+        of({ ...mockProfile, firstName: null, lastName: null, displayName: null }),
+      );
+      localStorage.setItem(
+        'profileExtras',
+        JSON.stringify({ firstName: 'Cached', lastName: 'Name' }),
+      );
+      fixture.detectChanges();
+      expect(component.displayFullName).toBe('Cached Name');
+    });
+
+    it('returns empty string when profile is null (not yet loaded)', () => {
+      // Don't trigger ngOnInit; profile stays null
+      localStorage.removeItem('profileExtras');
+      expect(component.displayFullName).toBe('');
     });
   });
 });
