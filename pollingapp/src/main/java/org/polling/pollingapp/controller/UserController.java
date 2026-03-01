@@ -55,6 +55,13 @@ public class UserController {
 		response.put("email", user.getEmail());
 		response.put("bio", user.getBio());
 		response.put("avatarUrl", user.getAvatarUrl());
+		response.put("firstName", user.getFirstName());
+		response.put("lastName", user.getLastName());
+		response.put("displayName", user.getDisplayName());
+		response.put("location", user.getLocation());
+		response.put("website", user.getWebsite());
+		response.put("gender", user.getGender());
+		response.put("dateOfBirth", user.getDateOfBirth());
 		response.put("createdAt", user.getCreatedAt());
 		return response;
 	}

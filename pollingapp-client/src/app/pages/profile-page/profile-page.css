@@ -348,31 +348,6 @@
   text-align: right;
 }
 
-/* ===== BADGES ===== */
-.badge {
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.badge.live {
-  background: #d4edda;
-  color: #155724;
-}
-
-.badge.readonly {
-  background: #e2e3e5;
-  color: #6c757d;
-}
-
-.badge.soon {
-  background: #fff3cd;
-  color: #856404;
-}
-
 /* ===== FORM ACTIONS ===== */
 .form-actions {
   margin-top: 2rem;

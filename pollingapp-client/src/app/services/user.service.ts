@@ -8,6 +8,13 @@ export interface UserProfile {
   email: string;
   bio: string | null;
   avatarUrl: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  displayName: string | null;
+  location: string | null;
+  website: string | null;
+  gender: string | null;
+  dateOfBirth: string | null;
   createdAt: string;
 }
 
@@ -15,6 +22,13 @@ export interface UpdateProfileRequest {
   username?: string;
   bio?: string;
   avatarUrl?: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+  location?: string;
+  website?: string;
+  gender?: string;
+  dateOfBirth?: string;
 }
 
 @Injectable({
