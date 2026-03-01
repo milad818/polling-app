@@ -67,7 +67,10 @@ public class UserService {
 		return userRepository.save(currentUser);
 	}
 
-	/** Returns true if the string is non-null and contains at least one non-whitespace character. */
+	/**
+	 * Returns true if the string is non-null and contains at least one
+	 * non-whitespace character.
+	 */
 	private boolean hasText(String value) {
 		return value != null && !value.isBlank();
 	}
