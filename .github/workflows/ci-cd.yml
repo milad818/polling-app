@@ -80,7 +80,11 @@ jobs:
     name: Build, Push & Deploy
     runs-on: ubuntu-latest
     needs: [backend-ci, frontend-ci]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: |
+      github.event_name == 'push' && (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/feat/production-backend-setup'
+      )
 
     steps:
       - uses: actions/checkout@v4
@@ -130,16 +134,18 @@ jobs:
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           IMAGE_TAG: ${{ github.sha }}
+          DEPLOY_BRANCH: ${{ github.ref_name }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: REGISTRY,BACKEND_REPO,FRONTEND_REPO,AWS_REGION,IMAGE_TAG
+          envs: REGISTRY,BACKEND_REPO,FRONTEND_REPO,AWS_REGION,IMAGE_TAG,DEPLOY_BRANCH
           script: |
+            cd ~/polling-app
+            git pull origin $DEPLOY_BRANCH
+            AWS_REGION=$AWS_REGION bash scripts/fetch-secrets.sh
             aws ecr get-login-password --region $AWS_REGION | \
               docker login --username AWS --password-stdin $REGISTRY
-            cd ~/polling-app
-            git pull origin main
             export BACKEND_IMAGE=$REGISTRY/$BACKEND_REPO:$IMAGE_TAG
             export FRONTEND_IMAGE=$REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
             docker compose pull backend frontend
