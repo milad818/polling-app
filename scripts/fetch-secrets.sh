@@ -20,7 +20,7 @@ JWT_SECRET=$(get_param /polling-app/JWT_SECRET)
 
 RDS_HOSTNAME=$(get_param /polling-app/RDS_HOSTNAME)
 RDS_PORT=3306
-RDS_DB_NAME=polling-app
+RDS_DB_NAME=pollingappdb
 RDS_USERNAME=admin
 EOF
 
