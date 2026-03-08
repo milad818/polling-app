@@ -86,7 +86,8 @@ jobs:
     if: |
       github.event_name == 'push' && (
         github.ref == 'refs/heads/main' ||
-        github.ref == 'refs/heads/feat/production-backend-setup'
+        github.ref == 'refs/heads/feat/production-backend-setup' ||
+        github.ref == 'refs/heads/test-ci-pipeline'
       )
 
     steps:
