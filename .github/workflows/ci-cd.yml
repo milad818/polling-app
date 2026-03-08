@@ -26,6 +26,9 @@ jobs:
           distribution: temurin
           cache: maven
 
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
       - name: Format check (Spotless)
         run: ./mvnw spotless:check -B --no-transfer-progress
 
@@ -82,12 +85,9 @@ jobs:
     needs: [backend-ci, frontend-ci]
     if: |
       github.event_name == 'push' && (
-        github.ref == 'refs/heads/main'
-        )
-    
-    # After CI/CD is finalized, it might be necessary to reconfigure the above if clause
-    # github.ref == 'refs/heads/main' ||
-    # github.ref == 'refs/heads/feat/production-backend-setup'
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/feat/production-backend-setup'
+      )
 
     steps:
       - uses: actions/checkout@v4
