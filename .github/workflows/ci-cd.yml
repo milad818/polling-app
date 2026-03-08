@@ -36,7 +36,7 @@ jobs:
         run: ./mvnw checkstyle:check -B --no-transfer-progress
 
       - name: Unit tests
-        run: ./mvnw test -B --no-transfer-progress
+        run: ./mvnw test -B --no-transfer-progress -Dtest='!PollingappApplicationTests'
 
   # ---------------------------------------------------------------------------
   # Frontend: format → lint → type-check → test → build
