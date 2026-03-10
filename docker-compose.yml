@@ -52,6 +52,10 @@ services:
       retries: 10
       start_period: 30s
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 350m
 
   # ---------------------------------------------------------------------------
   # backend – Spring Boot
@@ -87,6 +91,10 @@ services:
     networks:
       - polling-network
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 400m
 
   # ---------------------------------------------------------------------------
   # frontend – nginx + Angular SPA
