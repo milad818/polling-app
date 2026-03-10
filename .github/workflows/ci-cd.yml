@@ -152,5 +152,5 @@ jobs:
             export BACKEND_IMAGE=$REGISTRY/$BACKEND_REPO:$IMAGE_TAG
             export FRONTEND_IMAGE=$REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
             docker compose pull backend frontend
-            docker compose up -d --no-build
+            docker compose up -d --no-build backend frontend
             docker image prune -f

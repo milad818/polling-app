@@ -54,6 +54,14 @@ services:
     environment:
       # Disable caching and enable verbose output in dev
       SPRING_JPA_SHOW_SQL: "true"
+      # Point to local db container instead of RDS
+      RDS_HOSTNAME: db
+      RDS_PORT: "3306"
+      RDS_DB_NAME: polling-app
+      RDS_USERNAME: root
+    depends_on:
+      db:
+        condition: service_healthy
 
   # ── Frontend development overrides ────────────────────────────────────────
   frontend:
