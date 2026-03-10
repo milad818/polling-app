@@ -5,16 +5,18 @@ target/
 !**/src/test/**/target/
 
 ### Application Configuration ###
-# application.properties is committed because it only contains env-var
-# Profile-specific overrides (application-dev.properties etc.) may contain
-# real credentials and remain ignored.
-src/main/resources/application-*.properties
+# application.properties is committed — only contains env-var references.
+# application-prod.properties is committed — only contains env-var references, no real values.
+# Other profile overrides that may contain real credentials remain ignored.
+src/main/resources/application-dev.properties
+src/main/resources/application-local.properties
 src/main/resources/application.yml
 src/main/resources/application-*.yml
 
 ### Test Configuration ###
 src/test/resources/application.properties
 src/test/resources/application-*.properties
+!src/test/resources/application-test.properties
 
 ### STS ###
 .apt_generated

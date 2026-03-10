@@ -42,6 +42,8 @@ public class SecurityConfig {
 																											// tokens
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
+						// Health checks (ALB)
+						.requestMatchers("/actuator/health", "/actuator/info").permitAll()
 						// Public endpoints - no authentication required
 						.requestMatchers("/api/auth/**").permitAll().requestMatchers(HttpMethod.GET, "/api/polls/**")
 						.permitAll().requestMatchers(HttpMethod.POST, "/api/polls/vote").authenticated()

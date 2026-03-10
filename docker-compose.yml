@@ -69,17 +69,18 @@ services:
   # all traffic reaches it through nginx.  This reduces the attack surface.
   # ---------------------------------------------------------------------------
   backend:
+    image: ${BACKEND_IMAGE:-pollingapp-backend:latest}
     build:
       context: ./pollingapp
       target: production
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/polling-app
-      SPRING_DATASOURCE_USERNAME: root
+      SPRING_PROFILES_ACTIVE: prod
+      RDS_HOSTNAME: ${RDS_HOSTNAME}
+      RDS_PORT: ${RDS_PORT:-3306}
+      RDS_DB_NAME: ${RDS_DB_NAME}
+      RDS_USERNAME: ${RDS_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-    depends_on:
-      db:
-        condition: service_healthy
     networks:
       - polling-network
     restart: unless-stopped
@@ -92,6 +93,7 @@ services:
   # Port 80 is the only port exposed to the host in production.
   # ---------------------------------------------------------------------------
   frontend:
+    image: ${FRONTEND_IMAGE:-pollingapp-frontend:latest}
     build:
       context: ./pollingapp-client
       target: production
