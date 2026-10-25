@@ -73,6 +73,7 @@ export class PollComponent implements OnInit, OnChanges {
   }
 
   // Reset search whenever the parent switches the view
+  // The ngOnChanges lifecycle hook is designed specifically to track changes to data-bound @Input() properties.
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['view'] && !changes['view'].firstChange) {
       this.searchQuery = '';

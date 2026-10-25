@@ -65,7 +65,7 @@ class UserServiceTest {
 		when(userRepository.existsByUsername("newname")).thenReturn(false);
 		when(userRepository.save(any(User.class))).thenReturn(user);
 
-		User result = userService.updateProfile(user, request);
+		userService.updateProfile(user, request);
 
 		assertThat(user.getUsername()).isEqualTo("newname");
 		assertThat(user.getBio()).isEqualTo("New bio");
