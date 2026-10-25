@@ -22,7 +22,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/polls")
 public class PollController {
-	private final PollService pollService;		// When a field is final, it must be initialized in the constructor. This strongly encourages using constructor-based injection over field injection.
+	private final PollService pollService; // When a field is final, it must be initialized in the constructor. This
+											// strongly encourages using constructor-based injection over field
+											// injection.
 
 	public PollController(PollService pollService) {
 		this.pollService = pollService;
@@ -42,8 +44,10 @@ public class PollController {
 		return pollService.getAllPolls();
 	}
 
-	// ResponseEntity<Poll>: Returns the Poll object, typically serialized into JSON.
-	// Use this especially when the client needs to see the deleted or updated state of the resource.
+	// ResponseEntity<Poll>: Returns the Poll object, typically serialized into
+	// JSON.
+	// Use this especially when the client needs to see the deleted or updated state
+	// of the resource.
 	@GetMapping("/{id}")
 	public ResponseEntity<Poll> getPollById(@PathVariable Long id) {
 
@@ -75,10 +79,11 @@ public class PollController {
 	}
 
 	// Delete a poll - only the owner can delete their poll
-	// Chose not to return the final state, but just an empty body with a specific HTTP status code
+	// Chose not to return the final state, but just an empty body with a specific
+	// HTTP status code
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deletePoll(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
 		pollService.deletePoll(id, currentUser);
-		return ResponseEntity.noContent().build();	//  the HTTP standard for successful deletion
+		return ResponseEntity.noContent().build(); // the HTTP standard for successful deletion
 	}
 }
