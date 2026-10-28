@@ -3,6 +3,7 @@ package org.polling.pollingapp.controller;
 import org.polling.pollingapp.model.Poll;
 import org.polling.pollingapp.model.User;
 import org.polling.pollingapp.request.Vote;
+import org.polling.pollingapp.response.PollResponse;
 import org.polling.pollingapp.services.PollService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,38 +31,38 @@ public class PollController {
 
 	// Create a new poll - requires authentication, sets the owner automatically
 	@PostMapping
-	public Poll createPoll(@RequestBody Poll poll, @AuthenticationPrincipal User currentUser) {
-		return pollService.savePoll(poll, currentUser);
+	public PollResponse createPoll(@RequestBody Poll poll, @AuthenticationPrincipal User currentUser) {
+		return PollResponse.from(pollService.savePoll(poll, currentUser));
 	}
 
 	// If you put a URL in both, they concatenate (join together)
 	// If you leave @GetMapping empty, it defaults to the URL defined in the
 	// @RequestMapping
 	@GetMapping("/all")
-	public List<Poll> getPolls() {
-		return pollService.getAllPolls();
+	public List<PollResponse> getPolls() {
+		return pollService.getAllPolls().stream().map(PollResponse::from).toList();
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Poll> getPollById(@PathVariable Long id) {
+	public ResponseEntity<PollResponse> getPollById(@PathVariable Long id) {
 
 		return pollService.getPollById(id)
 				// Extracts the Poll from Optional<Poll> and wraps it in a ResponseEntity
-				.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+				.map(PollResponse::from).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
 	}
 
 	// Get all polls created by the authenticated user
 	@GetMapping("/my")
-	public List<Poll> getMyPolls(@AuthenticationPrincipal User currentUser) {
-		return pollService.getPollsByOwner(currentUser.getId());
+	public List<PollResponse> getMyPolls(@AuthenticationPrincipal User currentUser) {
+		return pollService.getPollsByOwner(currentUser.getId()).stream().map(PollResponse::from).toList();
 	}
 
 	// Update a poll - only the owner can update their poll
 	@PutMapping("/{id}")
-	public ResponseEntity<Poll> updatePoll(@PathVariable Long id, @RequestBody Poll poll,
+	public ResponseEntity<PollResponse> updatePoll(@PathVariable Long id, @RequestBody Poll poll,
 			@AuthenticationPrincipal User currentUser) {
 		Poll updated = pollService.updatePoll(id, poll, currentUser);
-		return ResponseEntity.ok(updated);
+		return ResponseEntity.ok(PollResponse.from(updated));
 	}
 
 	// Vote on a poll - requires authentication
