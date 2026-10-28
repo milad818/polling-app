@@ -6,7 +6,6 @@ export interface OptionVote {
 export interface PollOwner {
   id: number;
   username: string;
-  email: string;
 }
 
 export interface Poll {

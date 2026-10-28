@@ -14,7 +14,7 @@ const mockPolls: Poll[] = [
       { optText: 'Red', voteCount: 3 },
       { optText: 'Blue', voteCount: 7 },
     ],
-    owner: { id: 10, username: 'alice', email: 'alice@example.com' },
+    owner: { id: 10, username: 'alice' },
     createdAt: '2026-01-15T10:00:00',
   },
   {
